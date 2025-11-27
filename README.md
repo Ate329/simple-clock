@@ -2,6 +2,8 @@
 
 > Just a simple clock website. Inititally used to utilise my spare laptop.
 
+![Main Page](main-page.png)
+
 ## 💻 Running Locally
 
 1. **Clone the repository**:
@@ -47,6 +49,8 @@
 - **Focus Mode**: Minimalist view with just date and time
 - **Brightness Control**: 10-100%
 - **Toggle Elements**: Show/hide weather, forecast, and quotes
+
+![Settings Panel](setting.png)
 
 ## 🎯 Usage
 
