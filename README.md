@@ -2,13 +2,22 @@
 
 > Just a simple clock website. Inititally used to utilise my spare laptop.
 
-[![Live Demo](https://img.shields.io/badge/demo-live-success?style=for-the-badge)](https://clock.ate329.com)
+## 💻 Running Locally
 
-## 🌐 Live Demo
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Ate329/simple-clock.git
+   cd simple-clock
+   ```
 
-**Visit: [clock.ate329.com](https://clock.ate329.com)**
+2. **Start a local server**:
+   Using Python (pre-installed on most systems):
+   ```bash
+   python -m http.server
+   ```
 
-Press **F11** for fullscreen mode.
+3. **Open in Browser**:
+   Visit [http://localhost:8000](http://localhost:8000)
 
 ## ✨ Features
 
@@ -42,6 +51,8 @@ Press **F11** for fullscreen mode.
 ## 🎯 Usage
 
 Click the **gear icon** (⚙️) in the bottom-right corner to customize your display.
+
+Press **F11** for fullscreen mode.
 
 ## 🛠️ Tech Stack
 
