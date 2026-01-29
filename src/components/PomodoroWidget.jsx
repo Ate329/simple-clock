@@ -98,13 +98,14 @@ useEffect(() => {
         }
 
         if (mode === 'shortBreak') {
-            completedTimeInCurrentCycle += focusDuration;
             completedTimeInCurrentCycle += (shortBreakDuration - timeLeft);
         } else if (mode === 'longBreak') {
-            completedTimeInCurrentCycle += focusDuration;
-            for (let i = 0; i < settings.sessionsBeforeLongBreak - 1; i++) {
-                completedTimeInCurrentCycle += focusDuration;
-                completedTimeInCurrentCycle += shortBreakDuration;
+            // When entering long break after completing all sessions, sessionsInCurrentCycle is 0
+            // We need to account for all sessions and short breaks completed in this cycle
+            if (sessionsInCurrentCycle === 0 && completedSessions > 0) {
+                completedTimeInCurrentCycle = 
+                    (settings.sessionsBeforeLongBreak * focusDuration) + 
+                    ((settings.sessionsBeforeLongBreak - 1) * shortBreakDuration);
             }
             completedTimeInCurrentCycle += (longBreakDuration - timeLeft);
         } else if (mode === 'focus' && sessionsInCurrentCycle < settings.sessionsBeforeLongBreak) {
