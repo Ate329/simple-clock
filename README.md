@@ -4,8 +4,6 @@
 
 **Live Demo**: [clock.zyhe.me](https://clock.zyhe.me)
 
-![Main Page](main-page.png)
-
 ## Running Locally
 
 1. **Clone the repository**:
@@ -27,55 +25,16 @@
 4. **Open in Browser**:
    Visit [http://localhost:5173](http://localhost:5173)
 
-## Features
+## Pictures
+<img width="2559" height="1438" alt="image" src="https://github.com/user-attachments/assets/5b6826c5-5d43-4a22-86f2-9b7009f3850e" />
 
-### Dynamic Clock Display
-- Large, readable time with customizable fonts (JetBrains Mono, Roboto Mono, Space Mono)
-- 12-hour or 24-hour format
-- Automatic greeting based on time of day
-- Full date display
+<img width="2559" height="1438" alt="image" src="https://github.com/user-attachments/assets/0b808eb3-09ef-40b5-9a21-b49f07a8c1a9" />
 
-### Real-Time Weather
-- Auto-detects your location
-- Current temperature with high/low forecasts
-- 3-day weather forecast
-- Detailed view with humidity and wind speed
-- Celsius or Fahrenheit toggle
-- Weather code-based icons
+<img width="2559" height="1437" alt="image" src="https://github.com/user-attachments/assets/cb4ffc98-aba4-4268-a883-1401b148b4fa" />
 
-### Pomodoro Timer
-- Fully functional pomodoro timer with focus sessions and breaks
-- Customizable focus duration (1-60 min)
-- Customizable short break (1-30 min)  
-- Customizable long break (5-60 min)
-- Configurable sessions before long break (2-10 sessions)
-- Auto-start options for breaks and focus sessions
-- Session progress tracking with dot indicators
-- **Inner progress circle** - tracks entire cycle progress including all breaks
-- Completion celebration screen when all sessions finished
-- Audio feedback with Web Audio API
-- Skip, pause, and reset controls
+<img width="2558" height="1438" alt="image" src="https://github.com/user-attachments/assets/23e681b9-656f-4814-b663-aa2be6fd55cc" />
 
-### Inspirational Quotes
-- Random quotes with smart caching
-- Refreshes every 4 hours
-- Elegant typography display
-
-### Beautiful Design & Themes
-- **Multiple themes**: Aurora, Cyberpunk, Sunset, Ocean, Midnight
-- Animated gradient backgrounds
-- Glassmorphism UI with backdrop blur
-- Smooth transitions and animations
-- Dark mode optimized
-- Ambient glow effects
-
-### Customization
-- **Focus Mode**: Minimalist view with just date and time
-- **Brightness Control**: 10-100% adjustable overlay
-- **Toggle Elements**: Show/hide weather, forecast, quotes, and pomodoro timer
-- **Theme Selector**: Choose from 5 beautiful color schemes
-
-![Settings Panel](setting.png)
+<img width="2559" height="1438" alt="image" src="https://github.com/user-attachments/assets/c3eb00cd-f617-4ac6-b85f-5a484ee28b77" />
 
 ## Usage
 
