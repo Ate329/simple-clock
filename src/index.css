@@ -13,6 +13,8 @@ body {
     overflow: hidden;
     background-color: var(--bg-color);
     transition: background-color 1s ease;
+    height: 100vh;
+    height: 100dvh;
 }
 
 /* Animated Mesh Gradient Background */

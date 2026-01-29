@@ -79,7 +79,7 @@ function App() {
     }, []);
 
     return (
-        <div className="relative h-screen w-screen flex flex-col items-center overflow-hidden aurora-bg text-white">
+        <div className="relative h-screen h-[100dvh] w-full flex flex-col items-center overflow-hidden aurora-bg text-white">
             <div
                 className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 z-50"
                 style={{ opacity: (100 - settings.brightness) / 100 }}
@@ -90,7 +90,7 @@ function App() {
 
             <Navbar currentView={view} setView={setView} settings={settings} />
 
-            <main className="z-10 w-full h-full relative">
+            <main className="z-10 w-full flex-1 relative overflow-hidden">
                 <div
                     className={`absolute inset-0 transition-all duration-500 transform ${view === 'home' ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}
                     style={{ visibility: view === 'home' ? 'visible' : 'hidden' }}
@@ -113,9 +113,9 @@ function App() {
 
             <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="absolute bottom-8 right-8 p-4 text-white/30 hover:text-white transition-all duration-300 rounded-full hover:bg-white/10 z-40 group"
+                className="absolute bottom-4 sm:bottom-8 right-4 sm:right-8 p-3 sm:p-4 text-white/30 hover:text-white transition-all duration-300 rounded-full hover:bg-white/10 z-40 group"
             >
-                <Settings className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500" />
+                <Settings className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform duration-500" />
             </button>
 
             <SettingsModal
@@ -125,7 +125,7 @@ function App() {
                 updateSettings={updateSettings}
             />
 
-            <div className="absolute bottom-6 left-8 flex items-center gap-4 z-40 text-white/30 text-xs md:text-sm font-medium tracking-wide">
+            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-8 flex items-center gap-2 sm:gap-4 z-40 text-white/30 text-xs md:text-sm font-medium tracking-wide">
                 <a
                     href="https://github.com/Ate329/simple-clock"
                     target="_blank"

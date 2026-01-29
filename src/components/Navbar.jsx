@@ -8,8 +8,8 @@ const Navbar = ({ currentView, setView, settings }) => {
     ];
 
     return (
-        <nav className="fixed top-6 left-0 right-0 z-50 flex justify-center pointer-events-none">
-            <div className="pointer-events-auto inline-flex items-center gap-1 p-1.5 rounded-full bg-black/30 backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/20">
+        <nav className="fixed top-4 sm:top-6 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">
+            <div className="pointer-events-auto inline-flex items-center gap-1 p-1 sm:p-1.5 rounded-full bg-black/30 backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/20">
                 {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = currentView === tab.id;
@@ -19,9 +19,9 @@ const Navbar = ({ currentView, setView, settings }) => {
                             key={tab.id}
                             onClick={() => setView(tab.id)}
                             className={`
-                                relative flex items-center justify-center gap-2 
-                                px-5 py-2.5 rounded-full
-                                text-sm font-medium
+                                relative flex items-center justify-center gap-1.5 sm:gap-2 
+                                px-3 sm:px-5 py-2 sm:py-2.5 rounded-full
+                                text-xs sm:text-sm font-medium
                                 transition-all duration-300 ease-out
                                 ${isActive
                                     ? 'bg-white text-black shadow-lg'
@@ -30,7 +30,7 @@ const Navbar = ({ currentView, setView, settings }) => {
                             `}
                         >
                             <Icon
-                                className={`w-4 h-4 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}
+                                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}
                             />
                             <span className="tracking-wide">{tab.label}</span>
                         </button>

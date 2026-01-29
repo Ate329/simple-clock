@@ -18,12 +18,12 @@ const ForecastWidget = ({ weather, useCelsius }) => {
     };
 
     return (
-        <div className="flex gap-4 mt-6 justify-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        <div className="flex gap-2 sm:gap-4 mt-4 sm:mt-6 justify-center animate-fade-in flex-wrap" style={{ animationDelay: '0.2s' }}>
             {nextDays.map(i => (
-                <div key={i} className="glass-panel p-4 rounded-2xl flex flex-col items-center gap-2 min-w-[90px] hover:bg-white/5 transition-colors cursor-default">
-                    <span className="text-white/60 text-sm font-medium">{getDayName(daily.time[i])}</span>
-                    <div className="text-2xl text-white/90 my-1">
-                        <WeatherIcon code={daily.weather_code[i]} className="w-8 h-8" />
+                <div key={i} className="glass-panel p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col items-center gap-1 sm:gap-2 min-w-[70px] sm:min-w-[90px] hover:bg-white/5 transition-colors cursor-default">
+                    <span className="text-white/60 text-xs sm:text-sm font-medium">{getDayName(daily.time[i])}</span>
+                    <div className="text-xl sm:text-2xl text-white/90 my-1">
+                        <WeatherIcon code={daily.weather_code[i]} className="w-6 h-6 sm:w-8 sm:h-8" />
                     </div>
                     <div className="flex flex-col text-xs font-medium gap-1">
                         <span className="text-white/90">{displayTemp(daily.temperature_2m_max[i])}</span>

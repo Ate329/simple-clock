@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Play, Pause, RotateCcw, Settings, X, SkipForward, CheckCircle2, Sparkles } from 'lucide-react';
 
@@ -19,6 +19,22 @@ const PomodoroWidget = ({ isOpen }) => {
     const [showSettings, setShowSettings] = useState(false);
     const [audioContext, setAudioContext] = useState(null);
     const [isCompleted, setIsCompleted] = useState(false);
+    const [containerSize, setContainerSize] = useState(320);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        const updateSize = () => {
+            if (containerRef.current) {
+                const width = containerRef.current.offsetWidth;
+                const maxSize = Math.min(width, window.innerHeight * 0.45, 450);
+                setContainerSize(Math.max(maxSize, 280));
+            }
+        };
+
+        updateSize();
+        window.addEventListener('resize', updateSize);
+        return () => window.removeEventListener('resize', updateSize);
+    }, []);
 
     const getCurrentDuration = useCallback((currentMode) => {
         switch (currentMode) {
@@ -32,13 +48,13 @@ const PomodoroWidget = ({ isOpen }) => {
     const totalTime = getCurrentDuration(mode);
     const progress = ((totalTime - timeLeft) / totalTime) * 100;
 
-    const size = 450;
-    const strokeWidth = 6;
+    const size = containerSize;
+    const strokeWidth = Math.max(4, size * 0.013);
     const radius = (size - strokeWidth) / 2 - 20;
     const circumference = radius * 2 * Math.PI;
     const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-    const innerRadius = radius - 18;
+    const innerRadius = radius - Math.max(12, size * 0.04);
     const innerCircumference = innerRadius * 2 * Math.PI;
 
     const calculateOverallProgress = () => {
@@ -246,8 +262,8 @@ const PomodoroWidget = ({ isOpen }) => {
 
     if (isCompleted) {
         return (
-            <div className="flex flex-col items-center justify-center animate-fade-in w-full px-4 relative">
-                <div className="flex items-center gap-2 mb-6">
+            <div ref={containerRef} className="flex flex-col items-center justify-center animate-fade-in w-full px-4 relative max-w-[90vw]">
+            <div className="flex items-center gap-2 mb-2 sm:mb-6">
                     {Array.from({ length: settings.sessionsBeforeLongBreak }).map((_, i) => (
                         <div
                             key={i}
@@ -260,7 +276,7 @@ const PomodoroWidget = ({ isOpen }) => {
                 </div>
 
                 <div
-                    className="px-4 py-1.5 rounded-full text-sm font-medium mb-8 transition-colors duration-500"
+                className="px-4 py-1.5 rounded-full text-sm font-medium mb-3 sm:mb-8 transition-colors duration-500"
                     style={{ backgroundColor: activeColorFaded, color: activeColor }}
                 >
                     <span className="flex items-center gap-2">
@@ -269,7 +285,7 @@ const PomodoroWidget = ({ isOpen }) => {
                     </span>
                 </div>
 
-                <div className="relative mb-10">
+            <div className="relative mb-4 sm:mb-10">
                     <div
                         className="absolute inset-0 rounded-full blur-[80px] transition-all duration-1000 animate-pulse"
                         style={{
@@ -364,7 +380,7 @@ const PomodoroWidget = ({ isOpen }) => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center animate-fade-in w-full px-4 relative">
+        <div ref={containerRef} className="flex flex-col items-center justify-center animate-fade-in w-full px-4 relative max-w-[90vw]">
             <div className="flex items-center gap-2 mb-6">
                 {Array.from({ length: settings.sessionsBeforeLongBreak }).map((_, i) => (
                     <div
@@ -458,7 +474,7 @@ const PomodoroWidget = ({ isOpen }) => {
                     <div className="relative z-10 flex flex-col items-center">
                         <span
                             className={`
-                                text-6xl md:text-8xl font-light tracking-tight tabular-nums  
+                                text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-light tracking-tight tabular-nums  
                                 text-white drop-shadow-lg font-mono
                                 transition-transform duration-300
                                 ${isActive ? 'scale-105' : 'scale-100'}

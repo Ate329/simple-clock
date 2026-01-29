@@ -37,9 +37,9 @@ const QuoteWidget = () => {
     }, []);
 
     return (
-        <div className="mt-12 max-w-lg text-center animate-fade-in mx-auto" style={{ animationDelay: '0.5s' }}>
-            <p className="text-white/50 italic font-light">"{quote.text}"</p>
-            <p className="text-white/30 text-xs mt-2 uppercase tracking-wider">— {quote.author}</p>
+        <div className="mt-6 sm:mt-10 max-w-xs sm:max-w-lg px-4 text-center animate-fade-in mx-auto" style={{ animationDelay: '0.5s' }}>
+            <p className="text-white/50 italic font-light text-sm sm:text-base">"{quote.text}"</p>
+            <p className="text-white/30 text-xs mt-2 sm:mt-3 uppercase tracking-wider">— {quote.author}</p>
         </div>
     );
 };

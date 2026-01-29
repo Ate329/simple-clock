@@ -22,42 +22,42 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
     ];
 
     return (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md transition-all duration-300" onClick={onClose}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md transition-all duration-300 p-4" onClick={onClose}>
             <div
-                className="glass-panel w-full max-w-md p-8 rounded-3xl shadow-2xl m-4 space-y-8 transform transition-all scale-100 border border-white/10 max-h-[90vh] overflow-y-auto"
+                className="glass-panel w-full max-w-md p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-2xl space-y-6 sm:space-y-8 transform transition-all scale-100 border border-white/10 max-h-[85vh] overflow-y-auto"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="flex justify-between items-center border-b border-white/10 pb-6">
-                    <h2 className="text-2xl font-light tracking-wide text-white">Display Settings</h2>
-                    <button onClick={onClose} className="text-white/40 hover:text-white transition-colors">
-                        <X className="w-6 h-6" />
+                <div className="flex justify-between items-center border-b border-white/10 pb-4 sm:pb-6">
+                    <h2 className="text-xl sm:text-2xl font-light tracking-wide text-white">Display Settings</h2>
+                    <button onClick={onClose} className="text-white/40 hover:text-white transition-colors p-1">
+                        <X className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
                 </div>
 
-                <div className="space-y-8">
+                <div className="space-y-4 sm:space-y-8">
                     {settingsItems.map(item => {
                         const IconComponent = item.icon;
                         return (
                             <div key={item.key} className="flex items-center justify-between group">
-                                <div className="flex items-center gap-4 text-white/70 group-hover:text-white transition-colors">
-                                    <IconComponent className="w-5 h-5" />
-                                    <span className="text-lg font-light">{item.label}</span>
+                                <div className="flex items-center gap-2 sm:gap-4 text-white/70 group-hover:text-white transition-colors">
+                                    <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    <span className="text-sm sm:text-lg font-light">{item.label}</span>
                                 </div>
                                 <button
                                     onClick={() => updateSettings(item.key, !settings[item.key])}
-                                    className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${settings[item.key] ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]' : 'bg-white/10'}`}
+                                    className={`w-12 h-7 sm:w-14 sm:h-8 rounded-full p-1 transition-all duration-300 ${settings[item.key] ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]' : 'bg-white/10'}`}
                                 >
-                                    <div className={`w-6 h-6 bg-white rounded-full shadow-sm transform transition-transform duration-300 ${settings[item.key] ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                                    <div className={`w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-full shadow-sm transform transition-transform duration-300 ${settings[item.key] ? 'translate-x-5 sm:translate-x-6' : 'translate-x-0'}`}></div>
                                 </button>
                             </div>
                         );
                     })}
 
-                    <div className="space-y-4 pt-2">
+                    <div className="space-y-3 sm:space-y-4 pt-2">
                         <div className="flex items-center justify-between text-white/70">
-                            <div className="flex items-center gap-4">
-                                <Type className="w-5 h-5" />
-                                <span className="text-lg font-light">Clock Font</span>
+                            <div className="flex items-center gap-2 sm:gap-4">
+                                <Type className="w-4 h-4 sm:w-5 sm:h-5" />
+                                <span className="text-sm sm:text-lg font-light">Clock Font</span>
                             </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
@@ -65,7 +65,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                 <button
                                     key={font}
                                     onClick={() => updateSettings('clockFont', font)}
-                                    className={`px-3 py-2 rounded-lg text-xs border transition-all ${settings.clockFont === font ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10'}`}
+                                    className={`px-2 sm:px-3 py-2 rounded-lg text-xs border transition-all ${settings.clockFont === font ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10'}`}
                                     style={{ fontFamily: font }}
                                 >
                                     {font.split(' ')[0]}
@@ -74,11 +74,11 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                         </div>
                     </div>
 
-                    <div className="space-y-4 pt-2">
+                    <div className="space-y-3 sm:space-y-4 pt-2">
                         <div className="flex items-center justify-between text-white/70">
-                            <div className="flex items-center gap-4">
-                                <Palette className="w-5 h-5" />
-                                <span className="text-lg font-light">Theme</span>
+                            <div className="flex items-center gap-2 sm:gap-4">
+                                <Palette className="w-4 h-4 sm:w-5 sm:h-5" />
+                                <span className="text-sm sm:text-lg font-light">Theme</span>
                             </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
@@ -86,21 +86,21 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                 <button
                                     key={theme.id}
                                     onClick={() => updateSettings('theme', theme.id)}
-                                    className={`px-2 py-2 rounded-lg text-xs border transition-all flex flex-col items-center gap-1 ${settings.theme === theme.id ? 'bg-white/10 border-white text-white' : 'bg-transparent border-transparent text-white/40 hover:bg-white/5'}`}
+                                    className={`px-1 sm:px-2 py-2 rounded-lg text-xs border transition-all flex flex-col items-center gap-1 ${settings.theme === theme.id ? 'bg-white/10 border-white text-white' : 'bg-transparent border-transparent text-white/40 hover:bg-white/5'}`}
                                 >
-                                    <div className="w-full h-8 rounded bg-gradient-to-r from-transparent to-transparent"
+                                    <div className="w-full h-6 sm:h-8 rounded bg-gradient-to-r from-transparent to-transparent"
                                         style={{ background: `linear-gradient(135deg, ${theme.colors[0]}, ${theme.colors[1]})` }}></div>
-                                    <span>{theme.name}</span>
+                                    <span className="text-xs">{theme.name}</span>
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="space-y-4 pt-2">
+                    <div className="space-y-3 sm:space-y-4 pt-2">
                         <div className="flex items-center justify-between text-white/70">
-                            <div className="flex items-center gap-4">
-                                <Sun className="w-5 h-5" />
-                                <span className="text-lg font-light">Brightness</span>
+                            <div className="flex items-center gap-2 sm:gap-4">
+                                <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
+                                <span className="text-sm sm:text-lg font-light">Brightness</span>
                             </div>
                             <span className="text-xs font-mono bg-white/10 px-2 py-1 rounded">{settings.brightness}%</span>
                         </div>
