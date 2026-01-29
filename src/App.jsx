@@ -11,6 +11,11 @@ function App() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [settings, setSettings] = useState({
         format24h: false,
+        showSeconds: false,
+        dateFormat: 'weekday',
+        showDate: true,
+        showGreeting: true,
+        ampmStyle: 'subtle',
         useCelsius: true,
         detailedWeather: false,
         showForecast: false,
@@ -20,7 +25,12 @@ function App() {
         clockFont: 'JetBrains Mono',
         showPomodoro: true,
         theme: 'aurora',
-        performanceMode: 'full'
+        performanceMode: 'full',
+        weatherAppearance: 'compact',
+        animationSpeed: 'normal',
+        glassmorphismIntensity: 16,
+        widgetShadows: true,
+        backgroundStyle: 'gradient',
     });
 
     const [weather, setWeather] = useState(null);
@@ -45,7 +55,14 @@ function App() {
         root.style.setProperty('--gradient-1', current.g1);
         root.style.setProperty('--gradient-2', current.g2);
         root.style.setProperty('--gradient-3', current.g3);
-    }, [settings.theme]);
+
+        // Update body classes for appearance settings
+        document.body.className = `
+            speed-${settings.animationSpeed} 
+            ${settings.widgetShadows ? '' : 'shadows-off'} 
+            bg-${settings.backgroundStyle}
+        `.trim();
+    }, [settings.theme, settings.animationSpeed, settings.widgetShadows, settings.backgroundStyle]);
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);

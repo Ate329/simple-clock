@@ -1,6 +1,6 @@
 import WeatherIcon from './WeatherIcon';
 
-const WeatherWidget = ({ weather, loading, useCelsius, detailed }) => {
+const WeatherWidget = ({ weather, loading, useCelsius, appearance = 'compact' }) => {
     if (loading) return <div className="animate-pulse text-white/30 text-sm">Updating weather...</div>;
     if (!weather) return null;
 
@@ -17,20 +17,27 @@ const WeatherWidget = ({ weather, loading, useCelsius, detailed }) => {
         return `${Math.round((temp * 9 / 5) + 32)}°`;
     };
 
+    const isMinimal = appearance === 'minimal';
+    const isDetailed = appearance === 'detailed';
+
     return (
-        <div className={`glass-panel px-4 sm:px-8 py-3 sm:py-6 rounded-2xl sm:rounded-3xl flex flex-col items-center gap-2 sm:gap-4 hover:bg-white/5 transition-colors cursor-default ${detailed ? 'min-w-[220px] sm:min-w-[280px]' : ''}`}>
-            <div className="text-3xl sm:text-6xl text-white/90 drop-shadow-lg">
-                <WeatherIcon code={weatherCode} className="w-10 h-10 sm:w-16 sm:h-16" />
-            </div>
-            <div className="flex flex-col items-center">
-                <span className="text-3xl sm:text-5xl font-light tracking-tight">{displayTemp(currentTemp)}</span>
-                <div className="flex gap-3 sm:gap-4 text-xs sm:text-sm text-white/40 font-medium mt-1 sm:mt-2">
-                    <span>H: {displayTemp(maxTemp)}</span>
-                    <span>L: {displayTemp(minTemp)}</span>
+        <div className={`glass-panel px-4 sm:px-8 py-3 sm:py-6 rounded-2xl sm:rounded-3xl flex flex-col items-center gap-2 sm:gap-4 hover:bg-white/5 transition-colors cursor-default ${isDetailed ? 'min-w-[220px] sm:min-w-[280px]' : ''}`}>
+            {!isMinimal && (
+                <div className="text-3xl sm:text-6xl text-white/90 drop-shadow-lg">
+                    <WeatherIcon code={weatherCode} className="w-10 h-10 sm:w-16 sm:h-16" />
                 </div>
+            )}
+            <div className="flex flex-col items-center">
+                <span className={`font-light tracking-tight ${isMinimal ? 'text-4xl sm:text-6xl' : 'text-3xl sm:text-5xl'}`}>{displayTemp(currentTemp)}</span>
+                {!isMinimal && (
+                    <div className="flex gap-3 sm:gap-4 text-xs sm:text-sm text-white/40 font-medium mt-1 sm:mt-2">
+                        <span>H: {displayTemp(maxTemp)}</span>
+                        <span>L: {displayTemp(minTemp)}</span>
+                    </div>
+                )}
             </div>
 
-            {detailed && (
+            {isDetailed && (
                 <div className="grid grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10 w-full text-xs sm:text-sm">
                     <div className="flex flex-col items-center">
                         <span className="text-white/40 text-xs uppercase tracking-wider">Humidity</span>
