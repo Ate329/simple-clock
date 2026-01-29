@@ -21,9 +21,11 @@ const PomodoroWidget = ({ isOpen }) => {
     const [audioContext, setAudioContext] = useState(null);
     const [isCompleted, setIsCompleted] = useState(false);
     const [containerSize, setContainerSize] = useState(320);
+    const [shouldBreakText, setShouldBreakText] = useState(false);
     const containerRef = useRef(null);
+    const textRef = useRef(null);
 
-    useEffect(() => {
+useEffect(() => {
         const updateSize = () => {
             if (containerRef.current) {
                 const width = containerRef.current.offsetWidth;
@@ -32,10 +34,25 @@ const PomodoroWidget = ({ isOpen }) => {
             }
         };
 
+        const checkTextFit = () => {
+            if (textRef.current && containerRef.current) {
+                const textWidth = textRef.current.scrollWidth;
+                const availableWidth = containerSize * 0.7; // 70% of container width
+                setShouldBreakText(textWidth > availableWidth);
+            }
+        };
+
         updateSize();
-        window.addEventListener('resize', updateSize);
-        return () => window.removeEventListener('resize', updateSize);
-    }, []);
+        checkTextFit();
+        
+        const handleResize = () => {
+            updateSize();
+            checkTextFit();
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [containerSize]);
 
     const getCurrentDuration = useCallback((currentMode) => {
         switch (currentMode) {
@@ -364,8 +381,19 @@ const PomodoroWidget = ({ isOpen }) => {
                             <h3 className="text-2xl sm:text-3xl font-light text-white mb-2">
                                 Great Work!
                             </h3>
-                            <p className="text-white/50 text-xs sm:text-sm leading-relaxed">
-                                You have completed all {settings.sessionsBeforeLongBreak} focus sessions
+                            <p 
+                                ref={textRef}
+                                className="text-white/50 text-xs sm:text-sm leading-relaxed"
+                                style={{ whiteSpace: shouldBreakText ? 'normal' : 'nowrap' }}
+                            >
+                                {shouldBreakText ? (
+                                    <>
+                                        You have completed all<br />
+                                        {settings.sessionsBeforeLongBreak} focus sessions
+                                    </>
+                                ) : (
+                                    `You have completed all ${settings.sessionsBeforeLongBreak} focus sessions`
+                                )}
                             </p>
                         </div>
                     </div>
