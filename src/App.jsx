@@ -19,7 +19,8 @@ function App() {
         showQuote: true,
         clockFont: 'JetBrains Mono',
         showPomodoro: true,
-        theme: 'aurora'
+        theme: 'aurora',
+        performanceMode: 'full'
     });
 
     const [weather, setWeather] = useState(null);
@@ -78,14 +79,18 @@ function App() {
     }, []);
 
     return (
-        <div className="relative h-screen h-[100dvh] w-full flex flex-col items-center overflow-hidden aurora-bg text-white">
+        <div className={`relative h-screen h-[100dvh] w-full flex flex-col items-center overflow-hidden text-white ${settings.performanceMode === 'full' ? 'aurora-bg' : 'static-bg'} performance-${settings.performanceMode}`}>
             <div
                 className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 z-50"
                 style={{ opacity: (100 - settings.brightness) / 100 }}
             ></div>
 
-            <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-purple-600/20 rounded-full blur-[100px] animate-pulse"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-blue-600/20 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+            {settings.performanceMode !== 'minimal' && (
+                <>
+                    <div className={`absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-purple-600/20 rounded-full blur-[100px] ${settings.performanceMode === 'full' ? 'animate-pulse' : ''}`}></div>
+                    <div className={`absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-blue-600/20 rounded-full blur-[100px] ${settings.performanceMode === 'full' ? 'animate-pulse' : ''}`} style={{ animationDelay: '2s' }}></div>
+                </>
+            )}
 
             <Navbar currentView={view} setView={setView} settings={settings} />
 

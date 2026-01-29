@@ -28,6 +28,16 @@ body {
     transition: background 1s ease;
 }
 
+/* Static Background (for performance modes) */
+.static-bg {
+    background:
+        radial-gradient(at 0% 0%, var(--gradient-1) 0, transparent 50%),
+        radial-gradient(at 50% 0%, var(--gradient-2) 0, transparent 50%),
+        radial-gradient(at 100% 0%, var(--gradient-3) 0, transparent 50%);
+    background-size: 200% 200%;
+    transition: background 1s ease;
+}
+
 @keyframes aurora {
     0% {
         background-position: 0% 50%;
@@ -68,6 +78,35 @@ body {
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Performance mode: reduced - keep blur but reduce animations */
+.performance-reduced .glass-panel {
+    transition: none;
+}
+
+.performance-reduced * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+}
+
+/* Performance mode: minimal - disable blur and most effects */
+.performance-minimal .glass-panel {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.05);
+    transition: none;
+}
+
+.performance-minimal * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+}
+
+.performance-minimal .glass-button {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 .glass-button {

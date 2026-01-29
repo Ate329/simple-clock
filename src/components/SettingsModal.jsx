@@ -1,4 +1,4 @@
-import { X, Clock as ClockIcon, Thermometer, CloudLightning, CalendarDays, EyeOff, Timer, Quote, Type, Palette, Sun } from 'lucide-react';
+import { X, Clock as ClockIcon, Thermometer, CloudLightning, CalendarDays, EyeOff, Timer, Quote, Type, Palette, Sun, Zap } from 'lucide-react';
 
 const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
     if (!isOpen) return null;
@@ -112,6 +112,31 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                             onChange={(e) => updateSettings('brightness', parseInt(e.target.value))}
                             className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:accent-indigo-400"
                         />
+                    </div>
+
+                    <div className="space-y-3 sm:space-y-4 pt-2">
+                        <div className="flex items-center justify-between text-white/70">
+                            <div className="flex items-center gap-2 sm:gap-4">
+                                <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+                                <span className="text-sm sm:text-lg font-light">Performance Mode</span>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            {[
+                                { id: 'full', label: 'Full', desc: 'All effects' },
+                                { id: 'reduced', label: 'Reduced', desc: 'Less animation' },
+                                { id: 'minimal', label: 'Minimal', desc: 'Best performance' }
+                            ].map(mode => (
+                                <button
+                                    key={mode.id}
+                                    onClick={() => updateSettings('performanceMode', mode.id)}
+                                    className={`px-1 sm:px-2 py-2 rounded-lg text-xs border transition-all flex flex-col items-center gap-1 ${settings.performanceMode === mode.id ? 'bg-white/10 border-white text-white' : 'bg-transparent border-transparent text-white/40 hover:bg-white/5'}`}
+                                >
+                                    <span className="font-medium">{mode.label}</span>
+                                    <span className="text-[10px] opacity-70">{mode.desc}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
