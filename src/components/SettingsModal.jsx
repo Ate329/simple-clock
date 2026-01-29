@@ -9,6 +9,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
         { id: 'sunset', name: 'Sunset', colors: ['#1e3c72', '#2a5298', '#ff7e5f'] },
         { id: 'ocean', name: 'Ocean', colors: ['#000046', '#1cb5e0', '#000046'] },
         { id: 'midnight', name: 'Midnight', colors: ['#232526', '#414345', '#232526'] },
+        { id: 'forest', name: 'Forest', colors: ['#134e5e', '#71b280', '#134e5e'] },
     ];
 
     const settingsItems = [
@@ -61,7 +62,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                             </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
-                            {['JetBrains Mono', 'Roboto Mono', 'Space Mono'].map(font => (
+                            {['JetBrains Mono', 'Roboto Mono', 'Space Mono', 'Fira Code', 'Source Code Pro', 'IBM Plex Mono'].map(font => (
                                 <button
                                     key={font}
                                     onClick={() => updateSettings('clockFont', font)}
