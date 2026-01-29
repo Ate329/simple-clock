@@ -18,51 +18,253 @@ body {
     height: 100dvh;
 }
 
-/* Animated Mesh Gradient Background */
-.aurora-bg {
+/* Animation Style: Classic Aurora */
+.anim-classic {
     background:
-        radial-gradient(at 0% 0%, var(--gradient-1) 0, transparent 50%),
-        radial-gradient(at 50% 0%, var(--gradient-2) 0, transparent 50%),
-        radial-gradient(at 100% 0%, var(--gradient-3) 0, transparent 50%);
+        radial-gradient(ellipse at 0% 0%, var(--gradient-1) 0%, transparent 50%),
+        radial-gradient(ellipse at 100% 0%, var(--gradient-2) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, var(--gradient-3) 0%, transparent 50%);
     background-size: 200% 200%;
-    animation: aurora 15s ease infinite alternate;
-    transition: background 1s ease;
+    animation: aurora-classic 20s ease-in-out infinite alternate;
 }
 
-/* Static Background (for performance modes) */
-.static-bg {
+/* Animation Style: Wave Flow */
+.anim-wave {
     background:
-        radial-gradient(at 0% 0%, var(--gradient-1) 0, transparent 50%),
-        radial-gradient(at 50% 0%, var(--gradient-2) 0, transparent 50%),
-        radial-gradient(at 100% 0%, var(--gradient-3) 0, transparent 50%);
-    background-size: 200% 200%;
-    transition: background 1s ease;
+        radial-gradient(ellipse at 0% 50%, var(--gradient-1) 0%, transparent 60%),
+        radial-gradient(ellipse at 100% 50%, var(--gradient-2) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 0%, var(--gradient-3) 0%, transparent 50%);
+    background-size: 250% 250%;
+    animation: aurora-wave 15s ease-in-out infinite;
 }
 
-@keyframes aurora {
+/* Animation Style: Pulse & Breathe */
+.anim-pulse {
+    background:
+        radial-gradient(circle at 30% 30%, var(--gradient-1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, var(--gradient-2) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, var(--gradient-3) 0%, transparent 40%);
+    background-size: 150% 150%;
+    animation: aurora-pulse 12s ease-in-out infinite;
+}
+
+/* Animation Style: Cosmic Drift */
+.anim-drift {
+    background:
+        radial-gradient(ellipse at 20% 80%, var(--gradient-1) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 20%, var(--gradient-2) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, var(--gradient-3) 0%, transparent 50%),
+        radial-gradient(ellipse at 0% 50%, var(--gradient-2) 0%, transparent 40%);
+    background-size: 200% 200%;
+    animation: aurora-drift 25s linear infinite;
+}
+
+/* Animation Style: Northern Lights */
+.anim-lights {
+    background:
+        linear-gradient(180deg, var(--gradient-1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 0%, var(--gradient-2) 0%, transparent 60%),
+        radial-gradient(ellipse at 30% 100%, var(--gradient-3) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 100%, var(--gradient-1) 0%, transparent 50%);
+    background-size: 100% 200%, 200% 200%, 200% 200%, 200% 200%;
+    animation: aurora-lights 18s ease-in-out infinite;
+}
+
+/* Static Background (no animation) */
+.anim-static {
+    background:
+        radial-gradient(ellipse at 30% 30%, var(--gradient-1) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, var(--gradient-2) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, var(--gradient-3) 0%, transparent 60%);
+    background-size: 150% 150%;
+}
+
+/* Animation Keyframes */
+@keyframes aurora-classic {
+    0% { background-position: 0% 0%, 100% 0%, 50% 100%; }
+    33% { background-position: 50% 30%, 0% 50%, 100% 50%; }
+    66% { background-position: 100% 100%, 50% 0%, 0% 50%; }
+    100% { background-position: 0% 0%, 100% 0%, 50% 100%; }
+}
+
+@keyframes aurora-wave {
+    0% { background-position: 0% 50%, 100% 50%, 50% 0%; }
+    25% { background-position: 25% 25%, 75% 75%, 50% 50%; }
+    50% { background-position: 50% 50%, 50% 50%, 0% 100%; }
+    75% { background-position: 75% 75%, 25% 25%, 50% 0%; }
+    100% { background-position: 0% 50%, 100% 50%, 50% 0%; }
+}
+
+@keyframes aurora-pulse {
+    0%, 100% { 
+        background-position: 30% 30%, 70% 70%, 50% 50%;
+        filter: brightness(1) saturate(1);
+    }
+    50% { 
+        background-position: 40% 20%, 60% 80%, 50% 50%;
+        filter: brightness(1.2) saturate(1.3);
+    }
+}
+
+@keyframes aurora-drift {
+    0% { background-position: 0% 0%, 100% 100%, 50% 50%, 0% 50%; }
+    25% { background-position: 25% 75%, 75% 25%, 60% 40%, 25% 50%; }
+    50% { background-position: 50% 100%, 50% 0%, 40% 60%, 50% 50%; }
+    75% { background-position: 75% 25%, 25% 75%, 60% 40%, 75% 50%; }
+    100% { background-position: 0% 0%, 100% 100%, 50% 50%, 0% 50%; }
+}
+
+@keyframes aurora-lights {
+    0% { background-position: 0% 0%, 50% 0%, 30% 100%, 70% 100%; }
+    33% { background-position: 0% 50%, 30% 30%, 70% 70%, 30% 30%; }
+    66% { background-position: 0% 100%, 70% 70%, 30% 30%, 70% 70%; }
+    100% { background-position: 0% 0%, 50% 0%, 30% 100%, 70% 100%; }
+}
+
+/* Floating Blob Base Styles */
+.floating-blob {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+/* Orbital Movement - Circular path with variations */
+@keyframes blob-orbital {
     0% {
-        background-position: 0% 50%;
+        transform: translate(-50%, -50%) rotate(0deg) translateX(100px) rotate(0deg) scale(1);
     }
-
+    25% {
+        transform: translate(-50%, -50%) rotate(90deg) translateX(120px) rotate(-90deg) scale(1.1);
+    }
     50% {
-        background-position: 100% 50%;
+        transform: translate(-50%, -50%) rotate(180deg) translateX(100px) rotate(-180deg) scale(1);
     }
-
+    75% {
+        transform: translate(-50%, -50%) rotate(270deg) translateX(80px) rotate(-270deg) scale(0.9);
+    }
     100% {
-        background-position: 0% 50%;
+        transform: translate(-50%, -50%) rotate(360deg) translateX(100px) rotate(-360deg) scale(1);
     }
 }
 
-/* Floating Animation */
+/* Wander Movement - Meandering organic path */
+@keyframes blob-wander {
+    0% {
+        transform: translate(-50%, -50%) translate(0, 0) scale(1);
+    }
+    15% {
+        transform: translate(-50%, -50%) translate(80px, -40px) scale(1.05);
+    }
+    30% {
+        transform: translate(-50%, -50%) translate(120px, 20px) scale(0.95);
+    }
+    45% {
+        transform: translate(-50%, -50%) translate(60px, 80px) scale(1.1);
+    }
+    60% {
+        transform: translate(-50%, -50%) translate(-40px, 60px) scale(0.9);
+    }
+    75% {
+        transform: translate(-50%, -50%) translate(-80px, -20px) scale(1.05);
+    }
+    90% {
+        transform: translate(-50%, -50%) translate(-30px, -60px) scale(0.95);
+    }
+    100% {
+        transform: translate(-50%, -50%) translate(0, 0) scale(1);
+    }
+}
+
+/* Drift Movement - Slow floating with rotation */
+@keyframes blob-drift {
+    0% {
+        transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0.2;
+    }
+    33% {
+        transform: translate(-50%, -50%) translate(100px, -50px) rotate(120deg) scale(1.15);
+        opacity: 0.35;
+    }
+    66% {
+        transform: translate(-50%, -50%) translate(-50px, 50px) rotate(240deg) scale(0.85);
+        opacity: 0.25;
+    }
+    100% {
+        transform: translate(-50%, -50%) translate(0, 0) rotate(360deg) scale(1);
+        opacity: 0.2;
+    }
+}
+
+/* Float Movement - Gentle vertical floating */
+@keyframes blob-float {
+    0% {
+        transform: translate(-50%, -50%) translateY(0) scale(1);
+    }
+    33% {
+        transform: translate(-50%, -50%) translateY(-60px) translateX(30px) scale(1.1);
+    }
+    66% {
+        transform: translate(-50%, -50%) translateY(-30px) translateX(-20px) scale(0.95);
+    }
+    100% {
+        transform: translate(-50%, -50%) translateY(0) scale(1);
+    }
+}
+
+/* Pulse-Drift - Pulsing opacity while drifting */
+@keyframes blob-pulse-drift {
+    0% {
+        transform: translate(-50%, -50%) translate(0, 0) scale(0.8);
+        opacity: 0.1;
+    }
+    25% {
+        transform: translate(-50%, -50%) translate(60px, -30px) scale(1.2);
+        opacity: 0.4;
+    }
+    50% {
+        transform: translate(-50%, -50%) translate(100px, 40px) scale(1);
+        opacity: 0.25;
+    }
+    75% {
+        transform: translate(-50%, -50%) translate(20px, 60px) scale(1.3);
+        opacity: 0.35;
+    }
+    100% {
+        transform: translate(-50%, -50%) translate(0, 0) scale(0.8);
+        opacity: 0.1;
+    }
+}
+
+/* Blob Animation Classes */
+.blob-orbital {
+    animation: blob-orbital linear infinite;
+}
+
+.blob-wander {
+    animation: blob-wander ease-in-out infinite;
+}
+
+.blob-drift {
+    animation: blob-drift ease-in-out infinite;
+}
+
+.blob-float {
+    animation: blob-float ease-in-out infinite;
+}
+
+.blob-pulse-drift {
+    animation: blob-pulse-drift ease-in-out infinite;
+}
+
+/* Legacy Floating Animation */
 @keyframes float {
     0% {
         transform: translateY(0px);
     }
-
     50% {
         transform: translateY(-10px);
     }
-
     100% {
         transform: translateY(0px);
     }
@@ -91,6 +293,11 @@ body {
     animation-iteration-count: 1 !important;
 }
 
+.performance-reduced .floating-blob {
+    animation: none !important;
+    opacity: 0.3;
+}
+
 /* Performance mode: minimal - disable blur and most effects */
 .performance-minimal .glass-panel {
     backdrop-filter: none;
@@ -108,6 +315,10 @@ body {
 .performance-minimal .glass-button {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+}
+
+.performance-minimal .floating-blob {
+    display: none !important;
 }
 
 /* Animation Speed Classes */
@@ -150,6 +361,10 @@ body {
     animation: none !important;
 }
 
+.bg-solid .floating-blob {
+    display: none !important;
+}
+
 /* Transparent Background Style */
 .bg-transparent {
     background: transparent !important;
@@ -159,6 +374,10 @@ body {
 .bg-transparent .static-bg {
     background: transparent !important;
     animation: none !important;
+}
+
+.bg-transparent .floating-blob {
+    display: none !important;
 }
 
 .glass-button {
@@ -185,7 +404,6 @@ body {
         opacity: 0;
         transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -199,69 +417,4 @@ body {
 /* Hide scrollbar */
 ::-webkit-scrollbar {
     width: 0px;
-}
-
-/* Custom range input styling */
-input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 9999px;
-    height: 8px;
-    width: 100%;
-    cursor: pointer;
-    touch-action: pan-y;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: white;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    border: none;
-    margin-top: -8px;
-}
-
-input[type="range"]::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: white;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    border: none;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-    height: 8px;
-    background: transparent;
-    border-radius: 9999px;
-}
-
-input[type="range"]::-moz-range-track {
-    height: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 9999px;
-}
-
-/* Mobile range slider improvements */
-@media (max-width: 640px) {
-    input[type="range"] {
-        height: 8px;
-    }
-    
-    input[type="range"]::-webkit-slider-thumb {
-        width: 28px;
-        height: 28px;
-        margin-top: -10px;
-    }
-    
-    input[type="range"]::-moz-range-thumb {
-        width: 28px;
-        height: 28px;
-    }
 }

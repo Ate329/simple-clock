@@ -19,7 +19,7 @@ import {
     Calendar,
     Sparkles,
     Wind,
-    SlidersHorizontal
+    SlidersHorizontal,
 } from 'lucide-react';
 
 const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
@@ -67,6 +67,15 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
         { id: 'full', label: 'Full' },
     ];
 
+    const animationStyles = [
+        { id: 'classic', label: 'Classic Aurora', desc: 'Smooth flowing' },
+        { id: 'wave', label: 'Wave Flow', desc: 'Gentle waves' },
+        { id: 'pulse', label: 'Pulse & Breathe', desc: 'Rhythmic breathing' },
+        { id: 'drift', label: 'Cosmic Drift', desc: 'Slow drifting' },
+        { id: 'lights', label: 'Northern Lights', desc: 'Vertical flowing' },
+        { id: 'static', label: 'Static', desc: 'No animation' },
+    ];
+
     const displaySettings = [
         { label: '24-Hour Clock', icon: ClockIcon, key: 'format24h' },
         { label: 'Show Seconds', icon: Timer, key: 'showSeconds' },
@@ -102,6 +111,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
             glassmorphismIntensity: 16,
             widgetShadows: true,
             backgroundStyle: 'gradient',
+            animationStyle: 'classic',
         };
         Object.entries(defaultSettings).forEach(([key, value]) => {
             updateSettings(key, value);
@@ -407,6 +417,32 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                     </div>
                                 </div>
 
+                                {/* Animation Style */}
+                                <div className="space-y-3 pt-2">
+                                    <div className="flex items-center gap-2 text-white/60 text-sm">
+                                        <Sparkles className="w-4 h-4" />
+                                        <span>Animation Style</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {animationStyles.map((style) => (
+                                            <button
+                                                key={style.id}
+                                                onClick={() => updateSettings('animationStyle', style.id)}
+                                                className={`px-3 py-3 rounded-xl text-sm font-medium transition-all text-left ${
+                                                    settings.animationStyle === style.id
+                                                        ? 'bg-white text-black'
+                                                        : 'bg-white/10 text-white/70'
+                                                }`}
+                                            >
+                                                <div className="font-medium">{style.label}</div>
+                                                <div className={`text-xs mt-0.5 ${settings.animationStyle === style.id ? 'text-black/60' : 'text-white/50'}`}>
+                                                    {style.desc}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 {/* Weather Appearance */}
                                 <div className="space-y-3 pt-2">
                                     <div className="flex items-center gap-2 text-white/60 text-sm">
@@ -433,7 +469,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                 {/* Animation Speed */}
                                 <div className="space-y-3 pt-2">
                                     <div className="flex items-center gap-2 text-white/60 text-sm">
-                                        <Sparkles className="w-4 h-4" />
+                                        <Zap className="w-4 h-4" />
                                         <span>Animation Speed</span>
                                     </div>
                                     <div className="flex gap-3">
