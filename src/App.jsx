@@ -9,7 +9,6 @@ function App() {
     const [time, setTime] = useState(new Date());
     const [view, setView] = useState('home');
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
     const [settings, setSettings] = useState({
         format24h: false,
         useCelsius: true,
@@ -90,6 +89,13 @@ function App() {
 
             <Navbar currentView={view} setView={setView} settings={settings} />
 
+            <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="fixed top-4 sm:top-6 left-4 sm:left-8 p-3 sm:p-4 text-white/40 hover:text-white transition-all duration-300 rounded-full hover:bg-white/10 z-40 group"
+            >
+                <Settings className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform duration-500" />
+            </button>
+
             <main className="z-10 w-full flex-1 relative overflow-hidden">
                 <div
                     className={`absolute inset-0 transition-all duration-500 transform ${view === 'home' ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}
@@ -110,13 +116,6 @@ function App() {
                     <PomodoroPage />
                 </div>
             </main>
-
-            <button
-                onClick={() => setIsSettingsOpen(true)}
-                className="absolute bottom-4 sm:bottom-8 right-4 sm:right-8 p-3 sm:p-4 text-white/30 hover:text-white transition-all duration-300 rounded-full hover:bg-white/10 z-40 group"
-            >
-                <Settings className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform duration-500" />
-            </button>
 
             <SettingsModal
                 isOpen={isSettingsOpen}

@@ -14,6 +14,7 @@ const PomodoroWidget = ({ isOpen }) => {
 
     const [timeLeft, setTimeLeft] = useState(settings.focusTime * 60);
     const [isActive, setIsActive] = useState(false);
+    const [hasStarted, setHasStarted] = useState(false);
     const [mode, setMode] = useState('focus');
     const [completedSessions, setCompletedSessions] = useState(0);
     const [showSettings, setShowSettings] = useState(false);
@@ -199,6 +200,7 @@ const PomodoroWidget = ({ isOpen }) => {
                 audioContext.resume();
             }
             playSound('start');
+            setHasStarted(true);
         }
         setIsActive(!isActive);
     };
@@ -206,10 +208,14 @@ const PomodoroWidget = ({ isOpen }) => {
     const resetTimer = () => {
         setIsActive(false);
         setTimeLeft(getCurrentDuration(mode));
+        if (completedSessions === 0 && mode === 'focus') {
+            setHasStarted(false);
+        }
     };
 
     const resetAll = () => {
         setIsActive(false);
+        setHasStarted(false);
         setMode('focus');
         setTimeLeft(settings.focusTime * 60);
         setCompletedSessions(0);
@@ -218,6 +224,7 @@ const PomodoroWidget = ({ isOpen }) => {
 
     const skipToNext = () => {
         setIsActive(false);
+        setHasStarted(true);
         handleSessionComplete();
     };
 
@@ -352,12 +359,12 @@ const PomodoroWidget = ({ isOpen }) => {
                             />
                         </svg>
 
-                        <div className="relative z-10 flex flex-col items-center text-center max-w-[280px]">
-                            <Sparkles className="w-12 h-12 text-emerald-400 mb-4 animate-pulse" />
-                            <h3 className="text-3xl font-light text-white mb-2">
+                        <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-[260px] sm:max-w-[280px]">
+                            <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-400 mb-3 sm:mb-4 animate-pulse" />
+                            <h3 className="text-2xl sm:text-3xl font-light text-white mb-2">
                                 Great Work!
                             </h3>
-                            <p className="text-white/50 text-sm">
+                            <p className="text-white/50 text-xs sm:text-sm leading-relaxed">
                                 You have completed all {settings.sessionsBeforeLongBreak} focus sessions
                             </p>
                         </div>
@@ -527,13 +534,16 @@ const PomodoroWidget = ({ isOpen }) => {
                 </button>
             </div>
 
-            <button
-                onClick={() => setShowSettings(true)}
-                className="mt-8 flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors text-sm"
-            >
-                <Settings className="w-4 h-4" />
-                <span>Customize</span>
-            </button>
+            {!hasStarted && (
+                <button
+                    onClick={() => setShowSettings(true)}
+                    aria-label="Pomodoro customize"
+                    className="mt-8 flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors text-sm"
+                >
+                    <Settings className="w-4 h-4" />
+                    <span className="hidden sm:inline">Customize</span>
+                </button>
+            )}
 
             {completedSessions > 0 && (
                 <button
