@@ -9,29 +9,39 @@ function App() {
     const [time, setTime] = useState(new Date());
     const [view, setView] = useState('home');
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [settings, setSettings] = useState({
-        format24h: false,
-        showSeconds: false,
-        dateFormat: 'weekday',
-        showDate: true,
-        showGreeting: true,
-        ampmStyle: 'subtle',
-        useCelsius: true,
-        detailedWeather: false,
-        showForecast: false,
-        brightness: 100,
-        focusMode: false,
-        showQuote: true,
-        clockFont: 'JetBrains Mono',
-        showPomodoro: true,
-        theme: 'aurora',
-        performanceMode: 'full',
-        weatherAppearance: 'compact',
-        animationSpeed: 'normal',
-        glassmorphismIntensity: 16,
-        widgetShadows: true,
-        backgroundStyle: 'gradient',
-        animationStyle: 'classic',
+    const [settings, setSettings] = useState(() => {
+        const saved = localStorage.getItem('smart-clock-settings');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                console.error("Failed to parse settings", e);
+            }
+        }
+        return {
+            format24h: false,
+            showSeconds: false,
+            dateFormat: 'weekday',
+            showDate: true,
+            showGreeting: true,
+            ampmStyle: 'subtle',
+            useCelsius: true,
+            detailedWeather: false,
+            showForecast: false,
+            brightness: 100,
+            focusMode: false,
+            showQuote: true,
+            clockFont: 'JetBrains Mono',
+            showPomodoro: true,
+            theme: 'aurora',
+            performanceMode: 'full',
+            weatherAppearance: 'compact',
+            animationSpeed: 'normal',
+            glassmorphismIntensity: 16,
+            widgetShadows: true,
+            backgroundStyle: 'gradient',
+            animationStyle: 'classic',
+        };
     });
 
     const [weather, setWeather] = useState(null);
@@ -40,6 +50,10 @@ function App() {
     const updateSettings = (key, value) => {
         setSettings(prev => ({ ...prev, [key]: value }));
     };
+
+    useEffect(() => {
+        localStorage.setItem('smart-clock-settings', JSON.stringify(settings));
+    }, [settings]);
 
     useEffect(() => {
         const root = document.documentElement;
