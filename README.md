@@ -38,7 +38,8 @@
 
 ## Usage
 
-Click the **gear icon** in the bottom-right corner to open settings and customize your display.
+Click the **gear icon** in the top-left to open settings and customize your display.
+Click the **music icon** below it to open the **Soundscapes** panel, where you can mix ambient sounds.
 
 Use the **navigation tabs** at the top to switch between Clock and Pomodoro views.
 
@@ -80,8 +81,13 @@ src/
 │   ├── PomodoroWidget.jsx  # Pomodoro timer with progress tracking
 │   ├── QuoteWidget.jsx     # Inspirational quotes
 │   ├── SettingsModal.jsx   # Settings panel
+│   ├── SoundscapesModal.jsx # Ambient sound mixer
 │   ├── WeatherIcon.jsx     # Weather condition icons
 │   └── WeatherWidget.jsx   # Current weather display
+├── hooks/
+│   └── useSoundscapes.js   # Audio management hook
+├── data/
+│   └── sounds.json         # Sound asset registry
 ├── App.jsx                 # Main app component with theme management
 ├── main.jsx               # React entry point
 └── index.css              # Global styles and animations
@@ -93,6 +99,8 @@ src/
 - Quotes from [DummyJSON](https://dummyjson.com/)
 - Icons by [Lucide](https://lucide.dev/)
 - Fonts from [Google Fonts](https://fonts.google.com/)
+- Ambient sounds from [Moodist](https://github.com/remvze/moodist)
+  - Assets are licensed under the [Pixabay Content License](https://pixabay.com/service/license/) and [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## License
 

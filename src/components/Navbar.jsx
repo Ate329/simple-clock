@@ -25,7 +25,7 @@ const Navbar = ({ currentView, setView, settings }) => {
                                 transition-all duration-300 ease-out
                                 ${isActive
                                     ? 'bg-white text-black shadow-lg'
-                                    : 'text-white/60 hover:text-white hover:bg-white/10'
+                                    : 'opacity-60 text-white hover:opacity-100 hover:bg-white/10'
                                 }
                             `}
                         >

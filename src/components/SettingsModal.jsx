@@ -136,7 +136,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                     <h2 className="text-lg font-medium text-white">Settings</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 -mr-2 text-white/50 hover:text-white transition-colors rounded-full active:bg-white/10"
+                        className="p-2 -mr-2 opacity-50 text-white hover:opacity-100 transition-colors rounded-full active:bg-white/10"
                     >
                         <X className="w-6 h-6" />
                     </button>
@@ -146,22 +146,20 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                 <div className="sm:hidden flex border-b border-white/10 bg-black/40 flex-shrink-0">
                     <button
                         onClick={() => setActiveTab('display')}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-all ${
-                            activeTab === 'display'
-                                ? 'text-white border-b-2 border-indigo-500 bg-white/5'
-                                : 'text-white/40'
-                        }`}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-all ${activeTab === 'display'
+                            ? 'text-white border-b-2 border-indigo-500 bg-white/5'
+                            : 'opacity-40 text-white'
+                            }`}
                     >
                         <Monitor className="w-5 h-5" />
                         <span>Display</span>
                     </button>
                     <button
                         onClick={() => setActiveTab('appearance')}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-all ${
-                            activeTab === 'appearance'
-                                ? 'text-white border-b-2 border-indigo-500 bg-white/5'
-                                : 'text-white/40'
-                        }`}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-all ${activeTab === 'appearance'
+                            ? 'text-white border-b-2 border-indigo-500 bg-white/5'
+                            : 'opacity-40 text-white'
+                            }`}
                     >
                         <Paintbrush className="w-5 h-5" />
                         <span>Appearance</span>
@@ -176,22 +174,20 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                     <nav className="flex-1 p-4 space-y-2">
                         <button
                             onClick={() => setActiveTab('display')}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${
-                                activeTab === 'display'
-                                    ? 'bg-white/10 text-white'
-                                    : 'text-white/50 hover:text-white hover:bg-white/5'
-                            }`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${activeTab === 'display'
+                                ? 'bg-white/10 text-white'
+                                : 'opacity-50 text-white hover:opacity-100 hover:bg-white/5'
+                                }`}
                         >
                             <Monitor className="w-5 h-5" />
                             <span className="font-light">Display</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('appearance')}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${
-                                activeTab === 'appearance'
-                                    ? 'bg-white/10 text-white'
-                                    : 'text-white/50 hover:text-white hover:bg-white/5'
-                            }`}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${activeTab === 'appearance'
+                                ? 'bg-white/10 text-white'
+                                : 'opacity-50 text-white hover:opacity-100 hover:bg-white/5'
+                                }`}
                         >
                             <Paintbrush className="w-5 h-5" />
                             <span className="font-light">Appearance</span>
@@ -200,7 +196,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                     <div className="p-4 border-t border-white/10">
                         <button
                             onClick={handleReset}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm opacity-40 text-white hover:opacity-100 hover:text-red-400 hover:bg-red-500/10 transition-all"
                         >
                             <RotateCcw className="w-5 h-5" />
                             <span className="font-light">Reset All</span>
@@ -217,15 +213,15 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                         </h3>
                         <button
                             onClick={onClose}
-                            className="p-2 text-white/40 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                            className="p-2 opacity-40 text-white hover:opacity-100 transition-colors rounded-full hover:bg-white/10"
                         >
                             <X className="w-6 h-6" />
                         </button>
                     </div>
 
                     {/* Scrollable Content */}
-                    <div 
-                        className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 space-y-6 pb-20 sm:pb-6" 
+                    <div
+                        className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 space-y-6 pb-20 sm:pb-6"
                         style={{ WebkitOverflowScrolling: 'touch' }}
                     >
                         {activeTab === 'display' ? (
@@ -237,22 +233,20 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             key={item.key}
                                             className="flex items-center justify-between py-3.5 border-b border-white/5 last:border-0"
                                         >
-                                            <div className="flex items-center gap-3 text-white/80">
-                                                <item.icon className="w-5 h-5 text-white/50" />
+                                            <div className="flex items-center gap-3 opacity-80 text-white">
+                                                <item.icon className="w-5 h-5 opacity-50 text-white" />
                                                 <span className="text-base font-normal">{item.label}</span>
                                             </div>
                                             <button
                                                 onClick={() => updateSettings(item.key, !settings[item.key])}
-                                                className={`w-12 h-7 rounded-full p-1 transition-all duration-300 ${
-                                                    settings[item.key]
-                                                        ? 'bg-indigo-500'
-                                                        : 'bg-white/20'
-                                                }`}
+                                                className={`w-12 h-7 rounded-full p-1 transition-all duration-300 ${settings[item.key]
+                                                    ? 'bg-indigo-500'
+                                                    : 'bg-white/20'
+                                                    }`}
                                             >
                                                 <div
-                                                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                                                        settings[item.key] ? 'translate-x-5' : 'translate-x-0'
-                                                    }`}
+                                                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${settings[item.key] ? 'translate-x-5' : 'translate-x-0'
+                                                        }`}
                                                 />
                                             </button>
                                         </div>
@@ -262,7 +256,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                 {/* AM/PM Style */}
                                 {!settings.format24h && (
                                     <div className="space-y-3 pt-2">
-                                        <div className="flex items-center gap-2 text-white/60 text-sm">
+                                        <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                             <ClockIcon className="w-4 h-4" />
                                             <span>AM/PM Style</span>
                                         </div>
@@ -271,11 +265,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                                 <button
                                                     key={style}
                                                     onClick={() => updateSettings('ampmStyle', style)}
-                                                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all capitalize ${
-                                                        settings.ampmStyle === style
-                                                            ? 'bg-white text-black'
-                                                            : 'bg-white/10 text-white/70'
-                                                    }`}
+                                                    className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all capitalize ${settings.ampmStyle === style
+                                                        ? 'bg-white text-black'
+                                                        : 'bg-white/10 text-white/70'
+                                                        }`}
                                                 >
                                                     {style}
                                                 </button>
@@ -287,7 +280,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                 {/* Date Format */}
                                 {settings.showDate && (
                                     <div className="space-y-3 pt-4">
-                                        <div className="flex items-center gap-2 text-white/60 text-sm">
+                                        <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                             <CalendarDays className="w-4 h-4" />
                                             <span>Date Format</span>
                                         </div>
@@ -296,11 +289,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                                 <button
                                                     key={format.id}
                                                     onClick={() => updateSettings('dateFormat', format.id)}
-                                                    className={`px-3 py-3 rounded-xl text-sm font-medium transition-all ${
-                                                        settings.dateFormat === format.id
-                                                            ? 'bg-white text-black'
-                                                            : 'bg-white/10 text-white/70'
-                                                    }`}
+                                                    className={`px-3 py-3 rounded-xl text-sm font-medium transition-all ${settings.dateFormat === format.id
+                                                        ? 'bg-white text-black'
+                                                        : 'bg-white/10 text-white/70'
+                                                        }`}
                                                 >
                                                     {format.label}
                                                 </button>
@@ -311,7 +303,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                                 {/* Clock Font */}
                                 <div className="space-y-3 pt-4">
-                                    <div className="flex items-center gap-2 text-white/60 text-sm">
+                                    <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                         <Type className="w-4 h-4" />
                                         <span>Clock Font</span>
                                     </div>
@@ -327,11 +319,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             <button
                                                 key={font}
                                                 onClick={() => updateSettings('clockFont', font)}
-                                                className={`px-3 py-3 rounded-xl text-sm font-medium transition-all ${
-                                                    settings.clockFont === font
-                                                        ? 'bg-white text-black'
-                                                        : 'bg-white/10 text-white/70'
-                                                }`}
+                                                className={`px-3 py-3 rounded-xl text-sm font-medium transition-all ${settings.clockFont === font
+                                                    ? 'bg-white text-black'
+                                                    : 'bg-white/10 text-white/70'
+                                                    }`}
                                                 style={{ fontFamily: font }}
                                             >
                                                 {font.split(' ')[0]}
@@ -342,7 +333,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                                 {/* Brightness */}
                                 <div className="space-y-4 pt-4">
-                                    <div className="flex items-center justify-between text-white/60 text-sm">
+                                    <div className="flex items-center justify-between opacity-60 text-white text-sm">
                                         <div className="flex items-center gap-2">
                                             <Sun className="w-4 h-4" />
                                             <span>Brightness</span>
@@ -367,7 +358,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                             <>
                                 {/* Theme Selector */}
                                 <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-white/60 text-sm">
+                                    <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                         <Palette className="w-4 h-4" />
                                         <span>Theme</span>
                                     </div>
@@ -376,11 +367,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             <button
                                                 key={theme.id}
                                                 onClick={() => updateSettings('theme', theme.id)}
-                                                className={`p-3 rounded-xl transition-all flex flex-col items-center gap-2 ${
-                                                    settings.theme === theme.id
-                                                        ? 'bg-white/20 ring-2 ring-white/50'
-                                                        : 'bg-white/5'
-                                                }`}
+                                                className={`p-3 rounded-xl transition-all flex flex-col items-center gap-2 ${settings.theme === theme.id
+                                                    ? 'bg-white/20 ring-2 ring-white/50'
+                                                    : 'bg-white/5'
+                                                    }`}
                                             >
                                                 <div
                                                     className="w-full h-10 rounded-lg"
@@ -396,7 +386,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                                 {/* Background Style */}
                                 <div className="space-y-3 pt-2">
-                                    <div className="flex items-center gap-2 text-white/60 text-sm">
+                                    <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                         <Wind className="w-4 h-4" />
                                         <span>Background</span>
                                     </div>
@@ -405,11 +395,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             <button
                                                 key={style.id}
                                                 onClick={() => updateSettings('backgroundStyle', style.id)}
-                                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                                                    settings.backgroundStyle === style.id
-                                                        ? 'bg-white text-black'
-                                                        : 'bg-white/10 text-white/70'
-                                                }`}
+                                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${settings.backgroundStyle === style.id
+                                                    ? 'bg-white text-black'
+                                                    : 'bg-white/10 text-white/70'
+                                                    }`}
                                             >
                                                 {style.label}
                                             </button>
@@ -419,7 +408,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                                 {/* Animation Style */}
                                 <div className="space-y-3 pt-2">
-                                    <div className="flex items-center gap-2 text-white/60 text-sm">
+                                    <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                         <Sparkles className="w-4 h-4" />
                                         <span>Animation Style</span>
                                     </div>
@@ -428,11 +417,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             <button
                                                 key={style.id}
                                                 onClick={() => updateSettings('animationStyle', style.id)}
-                                                className={`px-3 py-3 rounded-xl text-sm font-medium transition-all text-left ${
-                                                    settings.animationStyle === style.id
-                                                        ? 'bg-white text-black'
-                                                        : 'bg-white/10 text-white/70'
-                                                }`}
+                                                className={`px-3 py-3 rounded-xl text-sm font-medium transition-all text-left ${settings.animationStyle === style.id
+                                                    ? 'bg-white text-black'
+                                                    : 'bg-white/10 text-white/70'
+                                                    }`}
                                             >
                                                 <div className="font-medium">{style.label}</div>
                                                 <div className={`text-xs mt-0.5 ${settings.animationStyle === style.id ? 'text-black/60' : 'text-white/50'}`}>
@@ -445,7 +433,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                                 {/* Weather Appearance */}
                                 <div className="space-y-3 pt-2">
-                                    <div className="flex items-center gap-2 text-white/60 text-sm">
+                                    <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                         <CloudLightning className="w-4 h-4" />
                                         <span>Weather Style</span>
                                     </div>
@@ -454,11 +442,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             <button
                                                 key={style.id}
                                                 onClick={() => updateSettings('weatherAppearance', style.id)}
-                                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                                                    settings.weatherAppearance === style.id
-                                                        ? 'bg-white text-black'
-                                                        : 'bg-white/10 text-white/70'
-                                                }`}
+                                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${settings.weatherAppearance === style.id
+                                                    ? 'bg-white text-black'
+                                                    : 'bg-white/10 text-white/70'
+                                                    }`}
                                             >
                                                 {style.label}
                                             </button>
@@ -468,7 +455,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                                 {/* Animation Speed */}
                                 <div className="space-y-3 pt-2">
-                                    <div className="flex items-center gap-2 text-white/60 text-sm">
+                                    <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                         <Zap className="w-4 h-4" />
                                         <span>Animation Speed</span>
                                     </div>
@@ -477,11 +464,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             <button
                                                 key={speed.id}
                                                 onClick={() => updateSettings('animationSpeed', speed.id)}
-                                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                                                    settings.animationSpeed === speed.id
-                                                        ? 'bg-white text-black'
-                                                        : 'bg-white/10 text-white/70'
-                                                }`}
+                                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${settings.animationSpeed === speed.id
+                                                    ? 'bg-white text-black'
+                                                    : 'bg-white/10 text-white/70'
+                                                    }`}
                                             >
                                                 {speed.label}
                                             </button>
@@ -491,7 +477,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                                 {/* Glassmorphism Intensity */}
                                 <div className="space-y-4 pt-2">
-                                    <div className="flex items-center justify-between text-white/60 text-sm">
+                                    <div className="flex items-center justify-between opacity-60 text-white text-sm">
                                         <div className="flex items-center gap-2">
                                             <SlidersHorizontal className="w-4 h-4" />
                                             <span>Panel Frosting</span>
@@ -518,29 +504,27 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                                 {/* Widget Shadows */}
                                 <div className="flex items-center justify-between py-4 border-b border-white/5">
-                                    <div className="flex items-center gap-3 text-white/80">
-                                        <Eye className="w-5 h-5 text-white/50" />
+                                    <div className="flex items-center gap-3 opacity-80 text-white">
+                                        <Eye className="w-5 h-5 opacity-50 text-white" />
                                         <span className="text-base">Widget Shadows</span>
                                     </div>
                                     <button
                                         onClick={() => updateSettings('widgetShadows', !settings.widgetShadows)}
-                                        className={`w-12 h-7 rounded-full p-1 transition-all duration-300 ${
-                                            settings.widgetShadows
-                                                ? 'bg-indigo-500'
-                                                : 'bg-white/20'
-                                        }`}
+                                        className={`w-12 h-7 rounded-full p-1 transition-all duration-300 ${settings.widgetShadows
+                                            ? 'bg-indigo-500'
+                                            : 'bg-white/20'
+                                            }`}
                                     >
                                         <div
-                                            className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                                                settings.widgetShadows ? 'translate-x-5' : 'translate-x-0'
-                                            }`}
+                                            className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${settings.widgetShadows ? 'translate-x-5' : 'translate-x-0'
+                                                }`}
                                         />
                                     </button>
                                 </div>
 
                                 {/* Performance Mode */}
                                 <div className="space-y-3 pt-2">
-                                    <div className="flex items-center gap-2 text-white/60 text-sm">
+                                    <div className="flex items-center gap-2 opacity-60 text-white text-sm">
                                         <Zap className="w-4 h-4" />
                                         <span>Performance Mode</span>
                                     </div>
@@ -549,11 +533,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             <button
                                                 key={mode.id}
                                                 onClick={() => updateSettings('performanceMode', mode.id)}
-                                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                                                    settings.performanceMode === mode.id
-                                                        ? 'bg-white text-black'
-                                                        : 'bg-white/10 text-white/70'
-                                                }`}
+                                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${settings.performanceMode === mode.id
+                                                    ? 'bg-white text-black'
+                                                    : 'bg-white/10 text-white/70'
+                                                    }`}
                                             >
                                                 {mode.label}
                                             </button>
@@ -567,7 +550,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                         <div className="sm:hidden pt-6 pb-8">
                             <button
                                 onClick={handleReset}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl text-base font-medium text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-all bg-white/5"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl text-base font-medium opacity-50 text-white hover:opacity-100 hover:text-red-400 hover:bg-red-500/10 transition-all bg-white/5"
                             >
                                 <RotateCcw className="w-5 h-5" />
                                 <span>Reset All Settings</span>

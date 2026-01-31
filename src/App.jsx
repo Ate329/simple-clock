@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Settings, Github } from 'lucide-react';
+
+import { Settings, Github, Music } from 'lucide-react';
 import Navbar from './components/Navbar';
 import HomePage from './components/HomePage';
 import PomodoroPage from './components/PomodoroPage';
 import SettingsModal from './components/SettingsModal';
+import SoundscapesModal from './components/SoundscapesModal';
+import { useSoundscapes } from './hooks/useSoundscapes';
 
 function App() {
     const [time, setTime] = useState(new Date());
     const [view, setView] = useState('home');
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isSoundscapesOpen, setIsSoundscapesOpen] = useState(false);
+    const soundscapes = useSoundscapes();
     const [settings, setSettings] = useState(() => {
         const saved = localStorage.getItem('smart-clock-settings');
         if (saved) {
@@ -122,9 +127,16 @@ function App() {
 
             <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="fixed top-4 sm:top-6 left-4 sm:left-8 p-3 sm:p-4 text-white/40 hover:text-white transition-all duration-300 rounded-full hover:bg-white/10 z-40 group"
+                className="fixed top-4 sm:top-6 left-4 sm:left-8 p-3 sm:p-4 opacity-40 text-white hover:opacity-100 transition-all duration-300 rounded-full hover:bg-white/10 z-40 group"
             >
                 <Settings className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform duration-500" />
+            </button>
+
+            <button
+                onClick={() => setIsSoundscapesOpen(true)}
+                className="fixed top-16 sm:top-24 left-4 sm:left-8 p-3 sm:p-4 opacity-40 text-white hover:opacity-100 transition-all duration-300 rounded-full hover:bg-white/10 z-40 group"
+            >
+                <Music className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-500" />
             </button>
 
             <main className="z-10 w-full flex-1 relative overflow-hidden">
@@ -153,6 +165,13 @@ function App() {
                 onClose={() => setIsSettingsOpen(false)}
                 settings={settings}
                 updateSettings={updateSettings}
+            />
+
+            <SoundscapesModal
+                isOpen={isSoundscapesOpen}
+                onClose={() => setIsSoundscapesOpen(false)}
+                soundscapes={soundscapes}
+                settings={settings}
             />
 
             <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-8 flex items-center gap-2 sm:gap-4 z-40 text-white/30 text-xs md:text-sm font-medium tracking-wide">
