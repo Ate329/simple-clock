@@ -1,6 +1,6 @@
 # Simple Clock
 
-> A beautiful, customizable clock display with weather, quotes, and pomodoro timer. The project was initially created for my spare laptop.
+> A beautiful, customizable clock display with weather, ambient sounds, and pomodoro timer. The project was initially created for my spare laptop.
 
 **Live Demo**: [clock.zyhe.me](https://clock.zyhe.me)
 
