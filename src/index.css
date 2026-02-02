@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    /* Global Range Slider Styling */
+    input[type="range"] {
+        @apply appearance-none bg-white/10 rounded-full cursor-pointer h-1.5;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        @apply appearance-none w-3 h-3 bg-white rounded-full border-0 shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-transform hover:scale-125;
+        margin-top: -3px;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        @apply border-none w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-transform hover:scale-125;
+    }
+
+    input[type="range"]:focus {
+        @apply outline-none;
+    }
+
+    /* Remove previous Soundscapes inline overrides if they persist in cache or specialized components, 
+       but standardizing here is best. */
+}
+
 :root {
     --bg-color: #000;
     --gradient-1: hsla(253, 16%, 7%, 1);

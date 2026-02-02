@@ -350,7 +350,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                         onChange={(e) =>
                                             updateSettings('brightness', parseInt(e.target.value))
                                         }
-                                        className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer"
+                                        className="w-full"
                                     />
                                 </div>
                             </>
@@ -498,7 +498,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                                 parseInt(e.target.value)
                                             )
                                         }
-                                        className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer"
+                                        className="w-full"
                                     />
                                 </div>
 

@@ -198,6 +198,30 @@ export const useSoundscapes = () => {
         };
     }, []);
 
+    // Update volume of a specific sound inside a preset
+    const updatePresetSoundVolume = useCallback((presetId, soundKey, volume) => {
+        setPresets(prev => {
+            const updated = prev.map(p => {
+                if (p.id === presetId) {
+                    const newActiveSounds = { ...p.activeSounds };
+                    if (newActiveSounds[soundKey]) {
+                        newActiveSounds[soundKey] = { ...newActiveSounds[soundKey], volume };
+                    }
+                    return { ...p, activeSounds: newActiveSounds };
+                }
+                return p;
+            });
+            localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+        });
+
+        // If this preset is currently loaded, also update the live sound volume
+        if (loadedPresetId === presetId) {
+            const [category, filename] = soundKey.split('/');
+            setSoundVolume(category, filename, volume);
+        }
+    }, [loadedPresetId, setSoundVolume]);
+
     return {
         activeSounds,
         toggleSound,
@@ -207,10 +231,11 @@ export const useSoundscapes = () => {
         stopAll,
         soundData,
         presets,
-        activePresetId: loadedPresetId, // Expose as activePresetId for clarity
+        activePresetId: loadedPresetId,
         savePreset,
-        updatePreset, // Check this!
+        updatePreset,
         loadPreset,
-        deletePreset
+        deletePreset,
+        updatePresetSoundVolume
     };
 };

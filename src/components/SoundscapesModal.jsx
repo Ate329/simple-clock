@@ -6,7 +6,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
         activeSounds, toggleSound, setVolume, stopAll, soundData,
         masterVolume, setMasterVolume,
         presets, savePreset, loadPreset, deletePreset,
-        activePresetId, updatePreset
+        activePresetId, updatePreset, updatePresetSoundVolume
     } = soundscapes;
 
     // Virtual category 'presets' added to the list
@@ -15,10 +15,16 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
     const [saveAsNewMode, setSaveAsNewMode] = useState(false);
     const [presetName, setPresetName] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [selectedPresetId, setSelectedPresetId] = useState(null);
 
     if (!isOpen) return null;
 
     const categories = ['presets', ...Object.keys(soundData)];
+
+    const handleCategoryChange = (cat) => {
+        setActiveCategory(cat);
+        setSelectedPresetId(null);
+    };
 
     const formatName = (name) => {
         return name.replace(/\.(mp3|wav)$/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -48,6 +54,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
     };
 
     const activePreset = presets.find(p => p.id === activePresetId);
+    const selectedPreset = presets.find(p => p.id === selectedPresetId);
 
     // Reset save mode when closing input
     const closeSaveInput = () => {
@@ -90,7 +97,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                     {categories.map(cat => (
                         <button
                             key={cat}
-                            onClick={() => setActiveCategory(cat)}
+                            onClick={() => handleCategoryChange(cat)}
                             className={`relative flex-none px-4 py-3 text-sm font-medium transition-all whitespace-nowrap ${activeCategory === cat
                                 ? 'text-white border-b-2 border-indigo-500 bg-white/5'
                                 : 'opacity-40 text-white'
@@ -127,7 +134,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                         {categories.map(cat => (
                             <button
                                 key={cat}
-                                onClick={() => setActiveCategory(cat)}
+                                onClick={() => handleCategoryChange(cat)}
                                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all ${activeCategory === cat
                                     ? 'bg-white/10 text-white shadow-sm'
                                     : 'opacity-60 text-white hover:opacity-100 hover:bg-white/5'
@@ -246,7 +253,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                                 step="0.01"
                                 value={masterVolume}
                                 onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
-                                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-115"
+                                className="w-full"
                                 style={{
                                     background: `linear-gradient(to right, #6366f1 ${masterVolume * 100}%, rgba(255, 255, 255, 0.1) ${masterVolume * 100}%)`
                                 }}
@@ -300,88 +307,197 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                     >
                         {activeCategory === 'presets' ? (
                             // PRESETS VIEW
-                            presets.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center opacity-50 space-y-4">
-                                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-2">
-                                        <FolderOpen className="w-8 h-8 text-white/40" />
+                            selectedPreset ? (
+                                // PRESET DETAIL VIEW
+                                <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
+                                    <div className="flex items-center gap-4 border-b border-white/10 pb-6">
+                                        <button
+                                            onClick={() => setSelectedPresetId(null)}
+                                            className="p-2 -ml-2 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                                        >
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M19 12H5m7-7l-7 7 7 7" />
+                                            </svg>
+                                        </button>
+                                        <div className="flex-1">
+                                            <h3 className="text-2xl font-light text-white">{selectedPreset.name}</h3>
+                                            <div className="flex items-center gap-3 text-sm text-white/40 mt-1">
+                                                <span>{new Date(selectedPreset.createdAt).toLocaleDateString()}</span>
+                                                <span className="w-1 h-1 bg-white/20 rounded-full" />
+                                                <span>{Math.round(selectedPreset.masterVolume * 100)}% Master Volume</span>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                loadPreset(selectedPreset.id);
+                                                // Optional: Close detail view or stay? Usually loading implies "using it now".
+                                                // But maybe user wants to stick around. 
+                                                // Let's provide visual feedback.
+                                            }}
+                                            className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+                                        >
+                                            <Play className="w-4 h-4 fill-current" />
+                                            Play Mix
+                                        </button>
                                     </div>
-                                    <div>
-                                        <p className="text-lg font-medium text-white">No presets yet</p>
-                                        <p className="text-sm text-white/50 max-w-xs mx-auto mt-2">
-                                            Mix some sounds from the other categories and click "Save Current Mix" to create your first preset.
-                                        </p>
+
+                                    <div className="bg-white/5 rounded-2xl border border-white/5 overflow-hidden">
+                                        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-white/5">
+                                            <h4 className="text-sm font-medium text-white/80">Included Sounds ({Object.keys(selectedPreset.activeSounds).length})</h4>
+                                        </div>
+                                        <div className="divide-y divide-white/5">
+                                            {Object.entries(selectedPreset.activeSounds).map(([id, data]) => {
+                                                const [cat, name] = id.split('/');
+                                                const vol = data.volume ?? 0.5;
+                                                return (
+                                                    <div key={id} className="flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-white/50">
+                                                                <Volume2 className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-white font-medium">{formatName(name)}</div>
+                                                                <div className="text-xs text-white/40 capitalize">{cat}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-3">
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="1"
+                                                                step="0.01"
+                                                                value={vol}
+                                                                onChange={(e) => updatePresetSoundVolume(selectedPreset.id, id, parseFloat(e.target.value))}
+                                                                className="w-24"
+                                                                style={{
+                                                                    background: `linear-gradient(to right, #6366f1 ${vol * 100}%, rgba(255, 255, 255, 0.1) ${vol * 100}%)`
+                                                                }}
+                                                            />
+                                                            <span className="text-xs text-white/40 w-8 text-right">{Math.round(vol * 100)}%</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-center pt-4 border-t border-white/10">
+                                        <button
+                                            onClick={() => {
+                                                if (confirm('Are you sure you want to delete this preset?')) {
+                                                    deletePreset(selectedPreset.id);
+                                                    setSelectedPresetId(null);
+                                                }
+                                            }}
+                                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-all text-sm"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                            Delete Preset
+                                        </button>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {presets.map(preset => (
-                                        <div
-                                            key={preset.id}
-                                            className="group relative p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-white/10 transition-all duration-300 flex flex-col"
-                                        >
-                                            <div className="flex items-start justify-between mb-4">
-                                                <div className="flex-1 min-w-0 pr-3">
-                                                    <h4 className="font-medium text-white text-lg truncate" title={preset.name}>
-                                                        {preset.name}
-                                                    </h4>
-                                                    <div className="text-xs text-white/40 mt-1 flex items-center gap-2">
-                                                        <span>{Object.keys(preset.activeSounds).length} sounds</span>
-                                                        <span className="w-0.5 h-0.5 bg-white/30 rounded-full" />
-                                                        <span>{Math.round(preset.masterVolume * 100)}% volume</span>
+                                // PRESETS GRID VIEW
+                                presets.length === 0 ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-center opacity-50 space-y-4">
+                                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-2">
+                                            <FolderOpen className="w-8 h-8 text-white/40" />
+                                        </div>
+                                        <div>
+                                            <p className="text-lg font-medium text-white">No presets yet</p>
+                                            <p className="text-sm text-white/50 max-w-xs mx-auto mt-2">
+                                                Mix some sounds from the other categories and click "Save Current Mix" to create your first preset.
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {presets.map(preset => {
+                                            // Get unique categories
+                                            const presetCategories = [...new Set(Object.keys(preset.activeSounds).map(id => id.split('/')[0]))];
+
+                                            return (
+                                                <div
+                                                    key={preset.id}
+                                                    onClick={() => setSelectedPresetId(preset.id)}
+                                                    className="group relative p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-white/10 transition-all duration-300 flex flex-col cursor-pointer"
+                                                >
+                                                    <div className="flex items-start justify-between mb-4">
+                                                        <div className="flex-1 min-w-0 pr-3">
+                                                            <h4 className="font-medium text-white text-lg truncate" title={preset.name}>
+                                                                {preset.name}
+                                                            </h4>
+                                                            <div className="text-xs text-white/40 mt-1 flex items-center gap-2">
+                                                                <span>{Object.keys(preset.activeSounds).length} sounds</span>
+                                                                <span className="w-0.5 h-0.5 bg-white/30 rounded-full" />
+                                                                <span>{Math.round(preset.masterVolume * 100)}% vol</span>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation(); // Prevent opening details
+                                                                loadPreset(preset.id);
+                                                            }}
+                                                            className="p-3 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 transform group-hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-black"
+                                                            title="Play Preset"
+                                                        >
+                                                            <Play className="w-5 h-5 fill-current" />
+                                                        </button>
+                                                    </div>
+
+                                                    <div className="flex-1 flex flex-wrap content-start gap-1.5 mb-4 max-h-24 overflow-hidden">
+                                                        {presetCategories.slice(0, 4).map(cat => (
+                                                            <span key={cat} className="px-2.5 py-1 rounded-full bg-white/5 text-xs text-white/60 border border-white/5 capitalize">
+                                                                {cat}
+                                                            </span>
+                                                        ))}
+                                                        {presetCategories.length > 4 && (
+                                                            <span className="px-2.5 py-1 rounded-full bg-white/5 text-xs text-white/40 border border-white/5">
+                                                                +{presetCategories.length - 4}
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="border-t border-white/5 pt-3 mt-auto flex items-center justify-between">
+                                                        <span className="text-[10px] text-white/20">
+                                                            {new Date(preset.createdAt).toLocaleDateString()}
+                                                        </span>
+                                                        {/* Optional: We could remove Delete from card to make it cleaner, 
+                                                            since it's in details now. But keeping it for quick access is nice.
+                                                            Let's check if user wanted to simplify the card heavily.
+                                                            "on each card, it should only display the different category of sound... and then if user click... show the details"
+                                                            I'll keep delete but make it subtle.
+                                                        */}
+                                                        {deleteConfirm === preset.id ? (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    deletePreset(preset.id);
+                                                                    setDeleteConfirm(null);
+                                                                }}
+                                                                className="flex items-center gap-1 px-2 py-1 rounded bg-red-500/20 text-red-400 text-xs hover:bg-red-500/30 transition-all"
+                                                            >
+                                                                <span>Confirm?</span>
+                                                                <Check className="w-3 h-3" />
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setDeleteConfirm(preset.id);
+                                                                }}
+                                                                className="p-1.5 rounded opacity-0 group-hover:opacity-40 hover:!opacity-100 hover:text-red-400 hover:bg-white/5 transition-all text-white"
+                                                                title="Delete Preset"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={() => loadPreset(preset.id)}
-                                                    className="p-3 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 transform group-hover:scale-105 transition-all"
-                                                    title="Load Preset"
-                                                >
-                                                    <Play className="w-5 h-5 fill-current" />
-                                                </button>
-                                            </div>
-
-                                            <div className="flex-1 flex flex-wrap content-start gap-1.5 mb-4 max-h-24 overflow-hidden">
-                                                {Object.keys(preset.activeSounds).map(soundId => {
-                                                    const name = soundId.split('/')[1];
-                                                    return (
-                                                        <span key={soundId} className="px-2 py-1 round-md bg-white/5 rounded text-[10px] text-white/60 border border-white/5 truncate max-w-[100px]">
-                                                            {formatName(name)}
-                                                        </span>
-                                                    );
-                                                })}
-                                            </div>
-
-                                            <div className="border-t border-white/5 pt-3 mt-auto flex items-center justify-between">
-                                                <span className="text-[10px] text-white/20">
-                                                    {new Date(preset.createdAt).toLocaleDateString()}
-                                                </span>
-                                                {deleteConfirm === preset.id ? (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            deletePreset(preset.id);
-                                                            setDeleteConfirm(null);
-                                                        }}
-                                                        className="flex items-center gap-1 px-2 py-1 rounded bg-red-500/20 text-red-400 text-xs hover:bg-red-500/30 transition-all"
-                                                    >
-                                                        <span>Confirm?</span>
-                                                        <Check className="w-3 h-3" />
-                                                    </button>
-                                                ) : (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setDeleteConfirm(preset.id);
-                                                        }}
-                                                        className="p-1.5 rounded opacity-40 hover:opacity-100 hover:text-red-400 hover:bg-white/5 transition-all text-white"
-                                                        title="Delete Preset"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )
                             )
                         ) : (
                             // SOUND GRID VIEW
