@@ -18,6 +18,7 @@ const PomodoroWidget = ({ isOpen }) => {
     const [mode, setMode] = useState('focus');
     const [completedSessions, setCompletedSessions] = useState(0);
     const [showSettings, setShowSettings] = useState(false);
+    const [isClosingSettings, setIsClosingSettings] = useState(false);
     const [audioContext, setAudioContext] = useState(null);
     const [isCompleted, setIsCompleted] = useState(false);
     const [containerSize, setContainerSize] = useState(320);
@@ -25,7 +26,7 @@ const PomodoroWidget = ({ isOpen }) => {
     const containerRef = useRef(null);
     const textRef = useRef(null);
 
-useEffect(() => {
+    useEffect(() => {
         const updateSize = () => {
             if (containerRef.current) {
                 const width = containerRef.current.offsetWidth;
@@ -44,12 +45,12 @@ useEffect(() => {
 
         updateSize();
         checkTextFit();
-        
+
         const handleResize = () => {
             updateSize();
             checkTextFit();
         };
-        
+
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [containerSize]);
@@ -103,8 +104,8 @@ useEffect(() => {
             // When entering long break after completing all sessions, sessionsInCurrentCycle is 0
             // We need to account for all sessions and short breaks completed in this cycle
             if (sessionsInCurrentCycle === 0 && completedSessions > 0) {
-                completedTimeInCurrentCycle = 
-                    (settings.sessionsBeforeLongBreak * focusDuration) + 
+                completedTimeInCurrentCycle =
+                    (settings.sessionsBeforeLongBreak * focusDuration) +
                     ((settings.sessionsBeforeLongBreak - 1) * shortBreakDuration);
             }
             completedTimeInCurrentCycle += (longBreakDuration - timeLeft);
@@ -256,6 +257,14 @@ useEffect(() => {
         setSettings(prev => ({ ...prev, [key]: value }));
     };
 
+    const handleCloseSettings = () => {
+        setIsClosingSettings(true);
+        setTimeout(() => {
+            setShowSettings(false);
+            setIsClosingSettings(false);
+        }, 300);
+    };
+
     useEffect(() => {
         if (!isActive) {
             setTimeLeft(getCurrentDuration(mode));
@@ -288,7 +297,7 @@ useEffect(() => {
     if (isCompleted) {
         return (
             <div ref={containerRef} className="flex flex-col items-center justify-center animate-fade-in w-full px-4 relative max-w-[90vw]">
-            <div className="flex items-center gap-2 mb-2 sm:mb-6">
+                <div className="flex items-center gap-2 mb-2 sm:mb-6">
                     {Array.from({ length: settings.sessionsBeforeLongBreak }).map((_, i) => (
                         <div
                             key={i}
@@ -301,7 +310,7 @@ useEffect(() => {
                 </div>
 
                 <div
-                className="px-4 py-1.5 rounded-full text-sm font-medium mb-3 sm:mb-8 transition-colors duration-500"
+                    className="px-4 py-1.5 rounded-full text-sm font-medium mb-3 sm:mb-8 transition-colors duration-500"
                     style={{ backgroundColor: activeColorFaded, color: activeColor }}
                 >
                     <span className="flex items-center gap-2">
@@ -310,7 +319,7 @@ useEffect(() => {
                     </span>
                 </div>
 
-            <div className="relative mb-4 sm:mb-10">
+                <div className="relative mb-4 sm:mb-10">
                     <div
                         className="absolute inset-0 rounded-full blur-[80px] transition-all duration-1000 animate-pulse"
                         style={{
@@ -382,7 +391,7 @@ useEffect(() => {
                             <h3 className="text-2xl sm:text-3xl font-light text-white mb-2">
                                 Great Work!
                             </h3>
-                            <p 
+                            <p
                                 ref={textRef}
                                 className="text-white/50 text-xs sm:text-sm leading-relaxed"
                                 style={{ whiteSpace: shouldBreakText ? 'normal' : 'nowrap' }}
@@ -575,6 +584,7 @@ useEffect(() => {
             )}
 
             {completedSessions > 0 && (
+
                 <button
                     onClick={resetAll}
                     className="absolute bottom-[-60px] flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/5 hover:bg-red-500/20 text-red-500/60 hover:text-red-200 transition-all duration-300 text-xs border border-red-500/5 hover:border-red-500/20 group"
@@ -584,109 +594,119 @@ useEffect(() => {
                 </button>
             )}
 
-            {showSettings && createPortal(
+            {(showSettings || isClosingSettings) && createPortal(
                 <div
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md"
-                    onClick={() => setShowSettings(false)}
+                    className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300 ${isClosingSettings ? 'animate-out fade-out duration-300' : 'animate-in fade-in duration-300'}`}
+                    onClick={handleCloseSettings}
                 >
                     <div
-                        className="bg-black/90 backdrop-blur-xl w-full max-w-sm p-6 rounded-3xl shadow-2xl m-4 border border-white/10"
+                        className={`bg-[#0a0a0a]/90 sm:bg-black/80 backdrop-blur-xl w-full max-w-sm p-0 rounded-3xl shadow-2xl m-4 border border-white/10 overflow-hidden ${isClosingSettings ? 'animate-out zoom-out-95 duration-300' : 'animate-in zoom-in-95 duration-300'}`}
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-medium text-white">Timer Settings</h3>
+                        <div className="flex justify-between items-center p-5 border-b border-white/10 bg-white/5">
+                            <div className="flex items-center gap-3">
+                                <Settings className="w-5 h-5 text-indigo-400" />
+                                <h3 className="text-lg font-light text-white tracking-wide">Timers</h3>
+                            </div>
                             <button
-                                onClick={() => setShowSettings(false)}
-                                className="text-white/40 hover:text-white transition-colors"
+                                onClick={handleCloseSettings}
+                                className="p-2 -mr-2 text-white/40 hover:text-white transition-colors rounded-full hover:bg-white/10"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
 
-                        <div className="space-y-5">
-                            <div>
-                                <label className="text-white/60 text-sm block mb-2">Focus Duration</label>
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="60"
-                                        value={settings.focusTime}
-                                        onChange={(e) => updateSetting('focusTime', parseInt(e.target.value))}
-                                        className="flex-1"
-                                    />
-                                    <span className="text-white font-mono text-sm w-16 text-right">{settings.focusTime} min</span>
+                        <div className="p-6 space-y-6">
+                            {/* Focus Duration */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center text-sm">
+                                    <label className="text-white/70">Focus Duration</label>
+                                    <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.focusTime} min</span>
                                 </div>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="60"
+                                    value={settings.focusTime}
+                                    onChange={(e) => updateSetting('focusTime', parseInt(e.target.value))}
+                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                    style={{
+                                        background: `linear-gradient(to right, #6366f1 ${((settings.focusTime - 1) / 59) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.focusTime - 1) / 59) * 100}%)`
+                                    }}
+                                />
                             </div>
 
-                            <div>
-                                <label className="text-white/60 text-sm block mb-2">Short Break</label>
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="range"
-                                        min="1"
-                                        max="30"
-                                        value={settings.shortBreakTime}
-                                        onChange={(e) => updateSetting('shortBreakTime', parseInt(e.target.value))}
-                                        className="flex-1"
-                                    />
-                                    <span className="text-white font-mono text-sm w-16 text-right">{settings.shortBreakTime} min</span>
+                            {/* Short Break */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center text-sm">
+                                    <label className="text-white/70">Short Break</label>
+                                    <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.shortBreakTime} min</span>
                                 </div>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="30"
+                                    value={settings.shortBreakTime}
+                                    onChange={(e) => updateSetting('shortBreakTime', parseInt(e.target.value))}
+                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                    style={{
+                                        background: `linear-gradient(to right, #2dd4bf ${((settings.shortBreakTime - 1) / 29) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.shortBreakTime - 1) / 29) * 100}%)`
+                                    }}
+                                />
                             </div>
 
-                            <div>
-                                <label className="text-white/60 text-sm block mb-2">Long Break</label>
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="range"
-                                        min="5"
-                                        max="60"
-                                        value={settings.longBreakTime}
-                                        onChange={(e) => updateSetting('longBreakTime', parseInt(e.target.value))}
-                                        className="flex-1"
-                                    />
-                                    <span className="text-white font-mono text-sm w-16 text-right">{settings.longBreakTime} min</span>
+                            {/* Long Break */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center text-sm">
+                                    <label className="text-white/70">Long Break</label>
+                                    <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.longBreakTime} min</span>
                                 </div>
+                                <input
+                                    type="range"
+                                    min="5"
+                                    max="60"
+                                    value={settings.longBreakTime}
+                                    onChange={(e) => updateSetting('longBreakTime', parseInt(e.target.value))}
+                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                    style={{
+                                        background: `linear-gradient(to right, #f59e0b ${((settings.longBreakTime - 5) / 55) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.longBreakTime - 5) / 55) * 100}%)`
+                                    }}
+                                />
                             </div>
 
-                            <div>
-                                <label className="text-white/60 text-sm block mb-2">Sessions before long break</label>
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="range"
-                                        min="2"
-                                        max="10"
-                                        value={settings.sessionsBeforeLongBreak}
-                                        onChange={(e) => updateSetting('sessionsBeforeLongBreak', parseInt(e.target.value))}
-                                        className="flex-1"
-                                    />
-                                    <span className="text-white font-mono text-sm w-16 text-right">{settings.sessionsBeforeLongBreak}</span>
+                            {/* Sessions Count */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center text-sm">
+                                    <label className="text-white/70">Sessions before Long Break</label>
+                                    <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.sessionsBeforeLongBreak}</span>
                                 </div>
+                                <input
+                                    type="range"
+                                    min="2"
+                                    max="10"
+                                    value={settings.sessionsBeforeLongBreak}
+                                    onChange={(e) => updateSetting('sessionsBeforeLongBreak', parseInt(e.target.value))}
+                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                    style={{
+                                        background: `linear-gradient(to right, #10b981 ${((settings.sessionsBeforeLongBreak - 2) / 8) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.sessionsBeforeLongBreak - 2) / 8) * 100}%)`
+                                    }}
+                                />
                             </div>
 
-                            <div className="pt-4 border-t border-white/10 space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-white/70 text-sm">Auto-start breaks</span>
-                                    <button
-                                        onClick={() => updateSetting('autoStartBreaks', !settings.autoStartBreaks)}
-                                        className={`w-12 h-7 rounded-full p-1 transition-all duration-300 ${settings.autoStartBreaks ? 'bg-indigo-500' : 'bg-white/10'
-                                            }`}
-                                    >
-                                        <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 ${settings.autoStartBreaks ? 'translate-x-5' : 'translate-x-0'
-                                            }`} />
-                                    </button>
+                            {/* Toggles */}
+                            <div className="pt-6 border-t border-white/10 space-y-4">
+                                <div className="flex items-center justify-between group cursor-pointer" onClick={() => updateSetting('autoStartBreaks', !settings.autoStartBreaks)}>
+                                    <span className="text-white/80 text-sm group-hover:text-white transition-colors">Auto-start Breaks</span>
+                                    <div className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${settings.autoStartBreaks ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/10 group-hover:bg-white/20'}`}>
+                                        <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${settings.autoStartBreaks ? 'translate-x-5' : 'translate-x-0'}`} />
+                                    </div>
                                 </div>
 
-                                <div className="flex items-center justify-between">
-                                    <span className="text-white/70 text-sm">Auto-start focus</span>
-                                    <button
-                                        onClick={() => updateSetting('autoStartFocus', !settings.autoStartFocus)}
-                                        className={`w-12 h-7 rounded-full p-1 transition-all duration-300 ${settings.autoStartFocus ? 'bg-indigo-500' : 'bg-white/10'
-                                            }`}
-                                    >
-                                        <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 ${settings.autoStartFocus ? 'translate-x-5' : 'translate-x-0'
-                                            }`} />
-                                    </button>
+                                <div className="flex items-center justify-between group cursor-pointer" onClick={() => updateSetting('autoStartFocus', !settings.autoStartFocus)}>
+                                    <span className="text-white/80 text-sm group-hover:text-white transition-colors">Auto-start Focus</span>
+                                    <div className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${settings.autoStartFocus ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/10 group-hover:bg-white/20'}`}>
+                                        <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${settings.autoStartFocus ? 'translate-x-5' : 'translate-x-0'}`} />
+                                    </div>
                                 </div>
                             </div>
                         </div>

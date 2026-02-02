@@ -18,20 +18,42 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
     const [selectedPresetId, setSelectedPresetId] = useState(null);
     const [isEditingName, setIsEditingName] = useState(false);
     const [editNameValue, setEditNameValue] = useState('');
+    const [isClosing, setIsClosing] = useState(false);
+    const [categoryContentKey, setCategoryContentKey] = useState(0);
+    const [isNavigatingBack, setIsNavigatingBack] = useState(false);
 
     useEffect(() => {
         setIsEditingName(false);
         setEditNameValue('');
     }, [selectedPresetId]);
 
-    if (!isOpen) return null;
+    if (!isOpen && !isClosing) return null;
 
     const categories = ['presets', ...Object.keys(soundData)];
 
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsClosing(false);
+            onClose();
+        }, 300);
+    };
+
     const handleCategoryChange = (cat) => {
-        setActiveCategory(cat);
-        setSelectedPresetId(null);
-        setIsEditingName(false);
+        if (cat !== activeCategory) {
+            setCategoryContentKey(prev => prev + 1);
+            setActiveCategory(cat);
+            setSelectedPresetId(null);
+            setIsEditingName(false);
+        }
+    };
+
+    const handleBackFromPreset = () => {
+        setIsNavigatingBack(true);
+        setTimeout(() => {
+            setSelectedPresetId(null);
+            setIsNavigatingBack(false);
+        }, 300);
     };
 
     const formatName = (name) => {
@@ -82,11 +104,11 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 sm:bg-black/80 backdrop-blur-md transition-all duration-300 p-0 sm:p-4"
-            onClick={onClose}
+            className={`fixed inset-0 z-50 flex items-center justify-center bg-black/95 sm:bg-black/80 backdrop-blur-md transition-all duration-300 p-0 sm:p-4 ${isClosing ? 'animate-out fade-out duration-300' : 'animate-in fade-in duration-300'}`}
+            onClick={handleClose}
         >
             <div
-                className="relative w-full h-[100dvh] sm:h-[85vh] sm:max-w-5xl sm:rounded-3xl shadow-2xl flex flex-col sm:flex-row overflow-hidden bg-[#0a0a0a] sm:bg-black/40 border-0 sm:border border-white/10"
+                className={`relative w-full h-[100dvh] sm:h-[85vh] sm:max-w-5xl sm:rounded-3xl shadow-2xl flex flex-col sm:flex-row overflow-hidden bg-[#0a0a0a] sm:bg-black/40 border-0 sm:border border-white/10 ${isClosing ? 'animate-out zoom-out-95 duration-300' : 'animate-in zoom-in-95 duration-300'}`}
                 onClick={(e) => e.stopPropagation()}
                 style={{
                     backdropFilter: settings?.glassmorphismIntensity > 0 ? `blur(${settings.glassmorphismIntensity}px)` : 'none',
@@ -100,7 +122,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                         Soundscapes
                     </h2>
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="p-2 -mr-2 opacity-50 text-white hover:opacity-100 transition-all rounded-full active:bg-white/10"
                     >
                         <X className="w-6 h-6" />
@@ -307,7 +329,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
 
                         <div className="flex items-center gap-4">
                             <button
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="p-2 opacity-40 text-white hover:opacity-100 transition-all rounded-full hover:bg-white/10"
                             >
                                 <X className="w-6 h-6" />
@@ -320,14 +342,15 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                         className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6"
                         style={{ WebkitOverflowScrolling: 'touch' }}
                     >
+                        <div key={categoryContentKey} className="animate-in slide-in-from-bottom-2 fade-in duration-300">
                         {activeCategory === 'presets' ? (
                             // PRESETS VIEW
                             selectedPreset ? (
                                 // PRESET DETAIL VIEW
-                                <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
+                                <div className={`space-y-6 ${isNavigatingBack ? 'animate-out slide-out-to-right fade-out duration-300' : 'animate-in slide-in-from-right-4 fade-in duration-300'}`}>
                                     <div className="flex items-center gap-4 border-b border-white/10 pb-6">
                                         <button
-                                            onClick={() => setSelectedPresetId(null)}
+                                            onClick={handleBackFromPreset}
                                             className="p-2 -ml-2 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-all"
                                         >
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -729,6 +752,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                             <div className="text-xs text-center space-y-1 text-white/20 pt-4">
                                 <p>Sounds provided by Moodist</p>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>

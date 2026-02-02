@@ -24,8 +24,25 @@ import {
 
 const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
     const [activeTab, setActiveTab] = useState('display');
+    const [isClosing, setIsClosing] = useState(false);
+    const [tabContentKey, setTabContentKey] = useState(0);
 
-    if (!isOpen) return null;
+    if (!isOpen && !isClosing) return null;
+
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsClosing(false);
+            onClose();
+        }, 300);
+    };
+
+    const handleTabChange = (tab) => {
+        if (tab !== activeTab) {
+            setTabContentKey(prev => prev + 1);
+            setActiveTab(tab);
+        }
+    };
 
     const themes = [
         { id: 'aurora', name: 'Aurora', colors: ['#0f0c29', '#302b63', '#24243e'] },
@@ -120,11 +137,11 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 sm:bg-black/80 backdrop-blur-md transition-all duration-300 p-0 sm:p-4"
-            onClick={onClose}
+            className={`fixed inset-0 z-50 flex items-center justify-center bg-black/95 sm:bg-black/80 backdrop-blur-md transition-all duration-300 p-0 sm:p-4 ${isClosing ? 'animate-out fade-out duration-300' : 'animate-in fade-in duration-300'}`}
+            onClick={handleClose}
         >
             <div
-                className="relative w-full h-[100dvh] sm:h-[85vh] sm:max-w-2xl sm:rounded-3xl shadow-2xl flex flex-col sm:flex-row overflow-hidden bg-[#0a0a0a] sm:bg-black/40 border-0 sm:border border-white/10"
+                className={`relative w-full h-[100dvh] sm:h-[85vh] sm:max-w-2xl sm:rounded-3xl shadow-2xl flex flex-col sm:flex-row overflow-hidden bg-[#0a0a0a] sm:bg-black/40 border-0 sm:border border-white/10 ${isClosing ? 'animate-out zoom-out-95 duration-300' : 'animate-in zoom-in-95 duration-300'}`}
                 onClick={(e) => e.stopPropagation()}
                 style={{
                     backdropFilter: settings.glassmorphismIntensity > 0 ? `blur(${settings.glassmorphismIntensity}px)` : 'none',
@@ -135,7 +152,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                 <div className="sm:hidden flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40 flex-shrink-0">
                     <h2 className="text-lg font-medium text-white">Settings</h2>
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="p-2 -mr-2 opacity-50 text-white hover:opacity-100 transition-colors rounded-full active:bg-white/10"
                     >
                         <X className="w-6 h-6" />
@@ -145,7 +162,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                 {/* Mobile Tab Navigation */}
                 <div className="sm:hidden flex border-b border-white/10 bg-black/40 flex-shrink-0">
                     <button
-                        onClick={() => setActiveTab('display')}
+                        onClick={() => handleTabChange('display')}
                         className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-all ${activeTab === 'display'
                             ? 'text-white border-b-2 border-indigo-500 bg-white/5'
                             : 'opacity-40 text-white'
@@ -155,7 +172,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                         <span>Display</span>
                     </button>
                     <button
-                        onClick={() => setActiveTab('appearance')}
+                        onClick={() => handleTabChange('appearance')}
                         className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-all ${activeTab === 'appearance'
                             ? 'text-white border-b-2 border-indigo-500 bg-white/5'
                             : 'opacity-40 text-white'
@@ -173,7 +190,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                     </div>
                     <nav className="flex-1 p-4 space-y-2">
                         <button
-                            onClick={() => setActiveTab('display')}
+                            onClick={() => handleTabChange('display')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${activeTab === 'display'
                                 ? 'bg-white/10 text-white'
                                 : 'opacity-50 text-white hover:opacity-100 hover:bg-white/5'
@@ -183,7 +200,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                             <span className="font-light">Display</span>
                         </button>
                         <button
-                            onClick={() => setActiveTab('appearance')}
+                            onClick={() => handleTabChange('appearance')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${activeTab === 'appearance'
                                 ? 'bg-white/10 text-white'
                                 : 'opacity-50 text-white hover:opacity-100 hover:bg-white/5'
@@ -212,7 +229,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                             {activeTab === 'display' ? 'Display Settings' : 'Appearance Settings'}
                         </h3>
                         <button
-                            onClick={onClose}
+                            onClick={handleClose}
                             className="p-2 opacity-40 text-white hover:opacity-100 transition-colors rounded-full hover:bg-white/10"
                         >
                             <X className="w-6 h-6" />
@@ -221,9 +238,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
 
                     {/* Scrollable Content */}
                     <div
-                        className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 space-y-6 pb-20 sm:pb-6"
+                        className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 pb-20 sm:pb-6"
                         style={{ WebkitOverflowScrolling: 'touch' }}
                     >
+                        <div key={tabContentKey} className="space-y-6 animate-in slide-in-from-bottom-2 fade-in duration-300">
                         {activeTab === 'display' ? (
                             <>
                                 {/* Toggle Settings */}
@@ -240,8 +258,8 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                             <button
                                                 onClick={() => updateSettings(item.key, !settings[item.key])}
                                                 className={`w-12 h-7 rounded-full p-1 transition-all duration-300 ${settings[item.key]
-                                                    ? 'bg-indigo-500'
-                                                    : 'bg-white/20'
+                                                    ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]'
+                                                    : 'bg-white/20 hover:bg-white/30'
                                                     }`}
                                             >
                                                 <div
@@ -350,7 +368,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                         onChange={(e) =>
                                             updateSettings('brightness', parseInt(e.target.value))
                                         }
-                                        className="w-full"
+                                        className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                        style={{
+                                            background: `linear-gradient(to right, #6366f1 ${((settings.brightness - 10) / 90) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.brightness - 10) / 90) * 100}%)`
+                                        }}
                                     />
                                 </div>
                             </>
@@ -498,7 +519,10 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                                 parseInt(e.target.value)
                                             )
                                         }
-                                        className="w-full"
+                                        className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                        style={{
+                                            background: `linear-gradient(to right, #6366f1 ${(settings.glassmorphismIntensity / 32) * 100}%, rgba(255, 255, 255, 0.1) ${(settings.glassmorphismIntensity / 32) * 100}%)`
+                                        }}
                                     />
                                 </div>
 
@@ -511,8 +535,8 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                     <button
                                         onClick={() => updateSettings('widgetShadows', !settings.widgetShadows)}
                                         className={`w-12 h-7 rounded-full p-1 transition-all duration-300 ${settings.widgetShadows
-                                            ? 'bg-indigo-500'
-                                            : 'bg-white/20'
+                                            ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]'
+                                            : 'bg-white/20 hover:bg-white/30'
                                             }`}
                                     >
                                         <div
@@ -555,6 +579,7 @@ const SettingsModal = ({ isOpen, onClose, settings, updateSettings }) => {
                                 <RotateCcw className="w-5 h-5" />
                                 <span>Reset All Settings</span>
                             </button>
+                        </div>
                         </div>
                     </div>
                 </div>
