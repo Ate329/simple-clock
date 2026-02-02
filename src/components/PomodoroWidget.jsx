@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import usePomodoroStats from '../hooks/usePomodoroStats';
 import { createPortal } from 'react-dom';
-import { Play, Pause, RotateCcw, Settings, X, SkipForward, CheckCircle2, Sparkles } from 'lucide-react';
+import { Play, Pause, RotateCcw, Settings, X, SkipForward, CheckCircle2, Sparkles, Activity, History, Timer, Coffee, Zap } from 'lucide-react';
 
 const PomodoroWidget = ({ isOpen }) => {
     const [settings, setSettings] = useState({
@@ -25,6 +26,23 @@ const PomodoroWidget = ({ isOpen }) => {
     const [shouldBreakText, setShouldBreakText] = useState(false);
     const containerRef = useRef(null);
     const textRef = useRef(null);
+    const [activeTab, setActiveTab] = useState('timer');
+    const { stats, addDuration, incrementSessions: incrementTotalSessions } = usePomodoroStats();
+    const sessionElapsedRef = useRef(0);
+
+    const flushStats = useCallback(() => {
+        if (sessionElapsedRef.current > 0) {
+            addDuration(sessionElapsedRef.current, mode);
+            sessionElapsedRef.current = 0;
+        }
+    }, [mode, addDuration]);
+
+    // Ensure stats are flushed when unmounting or before mode changes
+    useEffect(() => {
+        return () => {
+            flushStats();
+        };
+    }, [flushStats]);
 
     useEffect(() => {
         const updateSize = () => {
@@ -167,9 +185,11 @@ const PomodoroWidget = ({ isOpen }) => {
     }, [audioContext]);
 
     const handleSessionComplete = useCallback(() => {
+        flushStats();
         playSound('complete');
 
         if (mode === 'focus') {
+            incrementTotalSessions();
             const newCompletedSessions = completedSessions + 1;
             setCompletedSessions(newCompletedSessions);
 
@@ -198,13 +218,14 @@ const PomodoroWidget = ({ isOpen }) => {
             setTimeLeft(settings.focusTime * 60);
             setIsActive(settings.autoStartFocus);
         }
-    }, [mode, completedSessions, settings, playSound]);
+    }, [mode, completedSessions, settings, playSound, flushStats, incrementTotalSessions]);
 
     useEffect(() => {
         let interval = null;
         if (isActive && timeLeft > 0) {
             interval = setInterval(() => {
                 setTimeLeft(prev => prev - 1);
+                sessionElapsedRef.current += 1;
             }, 1000);
         } else if (isActive && timeLeft === 0) {
             setIsActive(false);
@@ -220,11 +241,14 @@ const PomodoroWidget = ({ isOpen }) => {
             }
             playSound('start');
             setHasStarted(true);
+        } else {
+            flushStats();
         }
         setIsActive(!isActive);
     };
 
     const resetTimer = () => {
+        flushStats();
         setIsActive(false);
         setTimeLeft(getCurrentDuration(mode));
         if (completedSessions === 0 && mode === 'focus') {
@@ -233,6 +257,17 @@ const PomodoroWidget = ({ isOpen }) => {
     };
 
     const resetAll = () => {
+        flushStats();
+        setIsActive(false);
+        setHasStarted(false);
+        setMode('focus');
+        setTimeLeft(settings.focusTime * 60);
+        setCompletedSessions(0);
+        setIsCompleted(false);
+    };
+
+    const endSession = () => {
+        // Do not flush stats - discard current unfinished session's time
         setIsActive(false);
         setHasStarted(false);
         setMode('focus');
@@ -269,7 +304,7 @@ const PomodoroWidget = ({ isOpen }) => {
         if (!isActive) {
             setTimeLeft(getCurrentDuration(mode));
         }
-    }, [settings.focusTime, settings.shortBreakTime, settings.longBreakTime]);
+    }, [settings.focusTime, settings.shortBreakTime, settings.longBreakTime, mode, getCurrentDuration, isActive]);
 
     if (!isOpen) return null;
 
@@ -584,14 +619,25 @@ const PomodoroWidget = ({ isOpen }) => {
             )}
 
             {completedSessions > 0 && (
+                <div className="absolute bottom-[-60px] flex items-center gap-3">
+                    <button
+                        onClick={endSession}
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/5 hover:bg-emerald-500/20 text-emerald-500/60 hover:text-emerald-200 transition-all duration-300 text-xs border border-emerald-500/5 hover:border-emerald-500/20 group"
+                        title="Finish current session batch (saves completed sessions only)"
+                    >
+                        <CheckCircle2 className="w-3 h-3 group-hover:scale-110 transition-transform duration-300" />
+                        End Session
+                    </button>
 
-                <button
-                    onClick={resetAll}
-                    className="absolute bottom-[-60px] flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/5 hover:bg-red-500/20 text-red-500/60 hover:text-red-200 transition-all duration-300 text-xs border border-red-500/5 hover:border-red-500/20 group"
-                >
-                    <RotateCcw className="w-3 h-3 group-hover:-rotate-180 transition-transform duration-500" />
-                    Reset Session Progress
-                </button>
+                    <button
+                        onClick={resetAll}
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/5 hover:bg-red-500/20 text-red-500/60 hover:text-red-200 transition-all duration-300 text-xs border border-red-500/5 hover:border-red-500/20 group"
+                        title="Reset progress and save partial time"
+                    >
+                        <RotateCcw className="w-3 h-3 group-hover:-rotate-180 transition-transform duration-500" />
+                        Reset Progress
+                    </button>
+                </div>
             )}
 
             {(showSettings || isClosingSettings) && createPortal(
@@ -606,7 +652,7 @@ const PomodoroWidget = ({ isOpen }) => {
                         <div className="flex justify-between items-center p-5 border-b border-white/10 bg-white/5">
                             <div className="flex items-center gap-3">
                                 <Settings className="w-5 h-5 text-indigo-400" />
-                                <h3 className="text-lg font-light text-white tracking-wide">Timers</h3>
+                                <h3 className="text-lg font-light text-white tracking-wide">Settings</h3>
                             </div>
                             <button
                                 onClick={handleCloseSettings}
@@ -616,99 +662,196 @@ const PomodoroWidget = ({ isOpen }) => {
                             </button>
                         </div>
 
-                        <div className="p-6 space-y-6">
-                            {/* Focus Duration */}
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center text-sm">
-                                    <label className="text-white/70">Focus Duration</label>
-                                    <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.focusTime} min</span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="60"
-                                    value={settings.focusTime}
-                                    onChange={(e) => updateSetting('focusTime', parseInt(e.target.value))}
-                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
-                                    style={{
-                                        background: `linear-gradient(to right, #6366f1 ${((settings.focusTime - 1) / 59) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.focusTime - 1) / 59) * 100}%)`
-                                    }}
-                                />
-                            </div>
+                        {/* Tabs */}
+                        <div className="flex border-b border-white/10 bg-white/5 mx-6 mt-4 rounded-xl p-1">
+                            <button
+                                onClick={() => setActiveTab('timer')}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-lg transition-all ${activeTab === 'timer'
+                                    ? 'bg-indigo-500 text-white shadow-lg'
+                                    : 'text-white/50 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                <Timer className="w-3.5 h-3.5" />
+                                Timer
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('stats')}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-lg transition-all ${activeTab === 'stats'
+                                    ? 'bg-indigo-500 text-white shadow-lg'
+                                    : 'text-white/50 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                <Activity className="w-3.5 h-3.5" />
+                                Statistics
+                            </button>
+                        </div>
 
-                            {/* Short Break */}
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center text-sm">
-                                    <label className="text-white/70">Short Break</label>
-                                    <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.shortBreakTime} min</span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="30"
-                                    value={settings.shortBreakTime}
-                                    onChange={(e) => updateSetting('shortBreakTime', parseInt(e.target.value))}
-                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
-                                    style={{
-                                        background: `linear-gradient(to right, #2dd4bf ${((settings.shortBreakTime - 1) / 29) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.shortBreakTime - 1) / 29) * 100}%)`
-                                    }}
-                                />
-                            </div>
-
-                            {/* Long Break */}
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center text-sm">
-                                    <label className="text-white/70">Long Break</label>
-                                    <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.longBreakTime} min</span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="5"
-                                    max="60"
-                                    value={settings.longBreakTime}
-                                    onChange={(e) => updateSetting('longBreakTime', parseInt(e.target.value))}
-                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
-                                    style={{
-                                        background: `linear-gradient(to right, #f59e0b ${((settings.longBreakTime - 5) / 55) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.longBreakTime - 5) / 55) * 100}%)`
-                                    }}
-                                />
-                            </div>
-
-                            {/* Sessions Count */}
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center text-sm">
-                                    <label className="text-white/70">Sessions before Long Break</label>
-                                    <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.sessionsBeforeLongBreak}</span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="2"
-                                    max="10"
-                                    value={settings.sessionsBeforeLongBreak}
-                                    onChange={(e) => updateSetting('sessionsBeforeLongBreak', parseInt(e.target.value))}
-                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
-                                    style={{
-                                        background: `linear-gradient(to right, #10b981 ${((settings.sessionsBeforeLongBreak - 2) / 8) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.sessionsBeforeLongBreak - 2) / 8) * 100}%)`
-                                    }}
-                                />
-                            </div>
-
-                            {/* Toggles */}
-                            <div className="pt-6 border-t border-white/10 space-y-4">
-                                <div className="flex items-center justify-between group cursor-pointer" onClick={() => updateSetting('autoStartBreaks', !settings.autoStartBreaks)}>
-                                    <span className="text-white/80 text-sm group-hover:text-white transition-colors">Auto-start Breaks</span>
-                                    <div className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${settings.autoStartBreaks ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/10 group-hover:bg-white/20'}`}>
-                                        <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${settings.autoStartBreaks ? 'translate-x-5' : 'translate-x-0'}`} />
+                        <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+                            {activeTab === 'timer' ? (
+                                <>
+                                    {/* Focus Duration */}
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <label className="text-white/70">Focus Duration</label>
+                                            <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.focusTime} min</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="60"
+                                            value={settings.focusTime}
+                                            onChange={(e) => updateSetting('focusTime', parseInt(e.target.value))}
+                                            className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                            style={{
+                                                background: `linear-gradient(to right, #6366f1 ${((settings.focusTime - 1) / 59) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.focusTime - 1) / 59) * 100}%)`
+                                            }}
+                                        />
                                     </div>
-                                </div>
 
-                                <div className="flex items-center justify-between group cursor-pointer" onClick={() => updateSetting('autoStartFocus', !settings.autoStartFocus)}>
-                                    <span className="text-white/80 text-sm group-hover:text-white transition-colors">Auto-start Focus</span>
-                                    <div className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${settings.autoStartFocus ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/10 group-hover:bg-white/20'}`}>
-                                        <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${settings.autoStartFocus ? 'translate-x-5' : 'translate-x-0'}`} />
+                                    {/* Short Break */}
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <label className="text-white/70">Short Break</label>
+                                            <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.shortBreakTime} min</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="30"
+                                            value={settings.shortBreakTime}
+                                            onChange={(e) => updateSetting('shortBreakTime', parseInt(e.target.value))}
+                                            className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                            style={{
+                                                background: `linear-gradient(to right, #2dd4bf ${((settings.shortBreakTime - 1) / 29) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.shortBreakTime - 1) / 29) * 100}%)`
+                                            }}
+                                        />
                                     </div>
+
+                                    {/* Long Break */}
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <label className="text-white/70">Long Break</label>
+                                            <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.longBreakTime} min</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="5"
+                                            max="60"
+                                            value={settings.longBreakTime}
+                                            onChange={(e) => updateSetting('longBreakTime', parseInt(e.target.value))}
+                                            className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                            style={{
+                                                background: `linear-gradient(to right, #f59e0b ${((settings.longBreakTime - 5) / 55) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.longBreakTime - 5) / 55) * 100}%)`
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Sessions Count */}
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <label className="text-white/70">Sessions before Long Break</label>
+                                            <span className="text-white font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{settings.sessionsBeforeLongBreak}</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="2"
+                                            max="10"
+                                            value={settings.sessionsBeforeLongBreak}
+                                            onChange={(e) => updateSetting('sessionsBeforeLongBreak', parseInt(e.target.value))}
+                                            className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-110 [&::-webkit-slider-thumb]:transition-transform"
+                                            style={{
+                                                background: `linear-gradient(to right, #10b981 ${((settings.sessionsBeforeLongBreak - 2) / 8) * 100}%, rgba(255, 255, 255, 0.1) ${((settings.sessionsBeforeLongBreak - 2) / 8) * 100}%)`
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Toggles */}
+                                    <div className="pt-6 border-t border-white/10 space-y-4">
+                                        <div className="flex items-center justify-between group cursor-pointer" onClick={() => updateSetting('autoStartBreaks', !settings.autoStartBreaks)}>
+                                            <span className="text-white/80 text-sm group-hover:text-white transition-colors">Auto-start Breaks</span>
+                                            <div className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${settings.autoStartBreaks ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/10 group-hover:bg-white/20'}`}>
+                                                <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${settings.autoStartBreaks ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between group cursor-pointer" onClick={() => updateSetting('autoStartFocus', !settings.autoStartFocus)}>
+                                            <span className="text-white/80 text-sm group-hover:text-white transition-colors">Auto-start Focus</span>
+                                            <div className={`w-11 h-6 rounded-full p-1 transition-all duration-300 ${settings.autoStartFocus ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-white/10 group-hover:bg-white/20'}`}>
+                                                <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 ${settings.autoStartFocus ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="space-y-4 pt-2">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 border border-white/5">
+                                            <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-1">
+                                                <Zap className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-2xl font-light text-white font-mono">{Math.floor(stats.totalFocusTime || 0)}</span>
+                                            <span className="text-xs text-white/40 uppercase tracking-wider text-center">Focus Mins</span>
+                                        </div>
+
+                                        <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 border border-white/5">
+                                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-1">
+                                                <CheckCircle2 className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-2xl font-light text-white font-mono">{stats.completedSessions || 0}</span>
+                                            <span className="text-xs text-white/40 uppercase tracking-wider text-center">Sessions</span>
+                                        </div>
+
+                                        <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 border border-white/5">
+                                            <div className="w-8 h-8 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center mb-1">
+                                                <Coffee className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-2xl font-light text-white font-mono">{Math.floor(stats.totalBreakTime || 0)}</span>
+                                            <span className="text-xs text-white/40 uppercase tracking-wider text-center">Break Mins</span>
+                                        </div>
+
+                                        <div className="bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 border border-white/5">
+                                            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center mb-1">
+                                                <History className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-2xl font-light text-white font-mono">{Math.floor((stats.totalFocusTime || 0) + (stats.totalBreakTime || 0))}</span>
+                                            <span className="text-xs text-white/40 uppercase tracking-wider text-center">Total Mins</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white/5 rounded-2xl p-5 border border-white/5 mt-4">
+                                        <div className="flex items-center gap-2 mb-3 opacity-60">
+                                            <Activity className="w-4 h-4 text-white" />
+                                            <span className="text-sm font-medium text-white">Focus Distribution</span>
+                                        </div>
+
+                                        <div className="flex h-3 rounded-full overflow-hidden bg-white/5">
+                                            <div
+                                                className="bg-indigo-500 transition-all duration-500"
+                                                style={{ width: `${(stats.totalFocusTime / (Math.max(1, (stats.totalFocusTime + stats.totalBreakTime)))) * 100}%` }}
+                                            />
+                                            <div
+                                                className="bg-teal-500 transition-all duration-500"
+                                                style={{ width: `${(stats.totalBreakTime / (Math.max(1, (stats.totalFocusTime + stats.totalBreakTime)))) * 100}%` }}
+                                            />
+                                        </div>
+
+                                        <div className="flex justify-between mt-2 text-xs text-white/40">
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                                                Focus
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-2 h-2 rounded-full bg-teal-500" />
+                                                Refuel
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-center text-xs text-white/30 pt-2">
+                                        Statistics are stored locally on your device.
+                                    </p>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>,
