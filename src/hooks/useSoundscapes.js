@@ -222,6 +222,26 @@ export const useSoundscapes = () => {
         }
     }, [loadedPresetId, setSoundVolume]);
 
+    // Rename a preset without changing its content
+    const renamePreset = useCallback((id, newName) => {
+        if (!id || !newName.trim()) return;
+
+        setPresets(prev => {
+            const updated = prev.map(p => {
+                if (p.id === id) {
+                    return {
+                        ...p,
+                        name: newName.trim(),
+                        updatedAt: new Date().toISOString()
+                    };
+                }
+                return p;
+            });
+            localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+        });
+    }, []);
+
     return {
         activeSounds,
         toggleSound,
@@ -236,6 +256,7 @@ export const useSoundscapes = () => {
         updatePreset,
         loadPreset,
         deletePreset,
-        updatePresetSoundVolume
+        updatePresetSoundVolume,
+        renamePreset
     };
 };

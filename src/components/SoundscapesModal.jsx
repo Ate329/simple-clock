@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Volume2, Volume1, Power, Music, Save, FolderOpen, Trash2, Plus, Check, Play, Edit3 } from 'lucide-react';
 
 const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
@@ -6,7 +6,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
         activeSounds, toggleSound, setVolume, stopAll, soundData,
         masterVolume, setMasterVolume,
         presets, savePreset, loadPreset, deletePreset,
-        activePresetId, updatePreset, updatePresetSoundVolume
+        activePresetId, updatePreset, updatePresetSoundVolume, renamePreset
     } = soundscapes;
 
     // Virtual category 'presets' added to the list
@@ -16,6 +16,13 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
     const [presetName, setPresetName] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [selectedPresetId, setSelectedPresetId] = useState(null);
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [editNameValue, setEditNameValue] = useState('');
+
+    useEffect(() => {
+        setIsEditingName(false);
+        setEditNameValue('');
+    }, [selectedPresetId]);
 
     if (!isOpen) return null;
 
@@ -24,6 +31,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
     const handleCategoryChange = (cat) => {
         setActiveCategory(cat);
         setSelectedPresetId(null);
+        setIsEditingName(false);
     };
 
     const formatName = (name) => {
@@ -50,6 +58,13 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
             updatePreset(activePresetId);
             setShowSaveInput(false);
             setSaveAsNewMode(false);
+        }
+    };
+
+    const handleRename = () => {
+        if (selectedPresetId && editNameValue.trim()) {
+            renamePreset(selectedPresetId, editNameValue);
+            setIsEditingName(false);
         }
     };
 
@@ -319,8 +334,58 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                                                 <path d="M19 12H5m7-7l-7 7 7 7" />
                                             </svg>
                                         </button>
-                                        <div className="flex-1">
-                                            <h3 className="text-2xl font-light text-white">{selectedPreset.name}</h3>
+                                        <div className="flex-1 min-w-0">
+                                            {isEditingName ? (
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="text"
+                                                        value={editNameValue}
+                                                        onChange={(e) => setEditNameValue(e.target.value)}
+                                                        className="flex-1 bg-white/10 border border-white/10 rounded-lg px-3 py-1.5 text-2xl font-light text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all min-w-0"
+                                                        autoFocus
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') handleRename();
+                                                            if (e.key === 'Escape') setIsEditingName(false);
+                                                            e.stopPropagation();
+                                                        }}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleRename();
+                                                        }}
+                                                        disabled={!editNameValue.trim()}
+                                                        className="p-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        <Check className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsEditingName(false);
+                                                        }}
+                                                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
+                                                    >
+                                                        <X className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-3">
+                                                    <h3 className="text-2xl font-light text-white truncate" title={selectedPreset.name}>{selectedPreset.name}</h3>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setEditNameValue(selectedPreset.name);
+                                                            setIsEditingName(true);
+                                                        }}
+                                                        className="p-2 rounded-full hover:bg-white/10 text-white/20 hover:text-white transition-all"
+                                                        title="Rename Preset"
+                                                    >
+                                                        <Edit3 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            )}
                                             <div className="flex items-center gap-3 text-sm text-white/40 mt-1">
                                                 <span>{new Date(selectedPreset.createdAt).toLocaleDateString()}</span>
                                                 <span className="w-1 h-1 bg-white/20 rounded-full" />
