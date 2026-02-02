@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import soundData from '../data/sounds.json';
 
+const PRESETS_STORAGE_KEY = 'soundscapes-presets';
+
 export const useSoundscapes = () => {
     // UI state: just track which are active and their volume for rendering
     const [activeSounds, setActiveSounds] = useState({}); // { "category/file.mp3": { volume: 0.5 } }
@@ -9,6 +11,14 @@ export const useSoundscapes = () => {
     const audioRefs = useRef({});
 
     const [masterVolume, setMasterVolume] = useState(1);
+    const [presets, setPresets] = useState(() => {
+        try {
+            const stored = localStorage.getItem(PRESETS_STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        } catch {
+            return [];
+        }
+    });
 
     const toggleSound = useCallback((category, filename) => {
         const id = `${category}/${filename}`;
@@ -97,6 +107,66 @@ export const useSoundscapes = () => {
         setActiveSounds({});
     }, []);
 
+    // Save current state as a preset
+    const savePreset = useCallback((name) => {
+        if (!name.trim()) return false;
+
+        const newPreset = {
+            id: Date.now().toString(),
+            name: name.trim(),
+            activeSounds: { ...activeSounds },
+            masterVolume,
+            createdAt: new Date().toISOString()
+        };
+
+        setPresets(prev => {
+            const updated = [...prev, newPreset];
+            localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+        });
+
+        return true;
+    }, [activeSounds, masterVolume]);
+
+    // Load a preset and apply it
+    const loadPreset = useCallback((presetId) => {
+        const preset = presets.find(p => p.id === presetId);
+        if (!preset) return;
+
+        // Stop all current sounds first
+        Object.values(audioRefs.current).forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+        audioRefs.current = {};
+
+        // Set master volume
+        setMasterVolume(preset.masterVolume);
+
+        // Start playing all sounds from the preset
+        const newActiveSounds = {};
+        Object.entries(preset.activeSounds).forEach(([id, data]) => {
+            const [category, filename] = id.split('/');
+            const audio = new Audio(`/sounds/${category}/${filename}`);
+            audio.loop = true;
+            audio.volume = (data.volume ?? 0.5) * preset.masterVolume;
+            audio.play().catch(e => console.error("Audio play failed", e));
+            audioRefs.current[id] = audio;
+            newActiveSounds[id] = { volume: data.volume ?? 0.5 };
+        });
+
+        setActiveSounds(newActiveSounds);
+    }, [presets]);
+
+    // Delete a preset
+    const deletePreset = useCallback((presetId) => {
+        setPresets(prev => {
+            const updated = prev.filter(p => p.id !== presetId);
+            localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+        });
+    }, []);
+
     // Cleanup on unmount
     useEffect(() => {
         return () => {
@@ -113,6 +183,10 @@ export const useSoundscapes = () => {
         masterVolume,
         setMasterVolume: changeMasterVolume,
         stopAll,
-        soundData
+        soundData,
+        presets,
+        savePreset,
+        loadPreset,
+        deletePreset
     };
 };
