@@ -5,12 +5,14 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
     const {
         activeSounds, toggleSound, setVolume, stopAll, soundData,
         masterVolume, setMasterVolume,
-        presets, savePreset, loadPreset, deletePreset
+        presets, savePreset, loadPreset, deletePreset,
+        activePresetId, updatePreset
     } = soundscapes;
 
     // Virtual category 'presets' added to the list
     const [activeCategory, setActiveCategory] = useState('presets');
     const [showSaveInput, setShowSaveInput] = useState(false);
+    const [saveAsNewMode, setSaveAsNewMode] = useState(false);
     const [presetName, setPresetName] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -27,13 +29,31 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
         return Object.keys(activeSounds).some(key => key.startsWith(`${cat}/`));
     };
 
-    const handleSavePreset = () => {
+    const handleSaveNew = () => {
         if (presetName.trim() && Object.keys(activeSounds).length > 0) {
             savePreset(presetName);
             setPresetName('');
             setShowSaveInput(false);
+            setSaveAsNewMode(false);
             setActiveCategory('presets'); // Switch to presets view to see new preset
         }
+    };
+
+    const handleUpdateActive = () => {
+        if (activePresetId && updatePreset) {
+            updatePreset(activePresetId);
+            setShowSaveInput(false);
+            setSaveAsNewMode(false);
+        }
+    };
+
+    const activePreset = presets.find(p => p.id === activePresetId);
+
+    // Reset save mode when closing input
+    const closeSaveInput = () => {
+        setShowSaveInput(false);
+        setSaveAsNewMode(false);
+        setPresetName('');
     };
 
     const getActiveSoundsCount = () => Object.keys(activeSounds).length;
@@ -143,34 +163,64 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                         {/* Save Preset UI */}
                         {showSaveInput ? (
                             <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-2 animate-in slide-in-from-bottom-2 fade-in duration-200">
-                                <div className="flex items-center gap-2 text-xs font-medium text-white/70">
-                                    <Edit3 className="w-3 h-3" />
-                                    <span>Name your mix</span>
-                                </div>
-                                <input
-                                    type="text"
-                                    value={presetName}
-                                    onChange={(e) => setPresetName(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSavePreset()}
-                                    placeholder="Study Vibes..."
-                                    className="w-full px-3 py-2 text-sm bg-black/50 rounded-lg border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
-                                    autoFocus
-                                />
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={handleSavePreset}
-                                        disabled={!presetName.trim()}
-                                        className="flex-1 py-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        Save
-                                    </button>
-                                    <button
-                                        onClick={() => { setShowSaveInput(false); setPresetName(''); }}
-                                        className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs transition-all"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
+                                {activePreset && !saveAsNewMode ? (
+                                    <>
+                                        <div className="text-xs font-medium text-white/70 px-1">
+                                            Current: <span className="text-white">{activePreset.name}</span>
+                                        </div>
+                                        <button
+                                            onClick={handleUpdateActive}
+                                            className="w-full py-2 px-3 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-medium transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <Save className="w-3 h-3" />
+                                            Update Existing
+                                        </button>
+                                        <button
+                                            onClick={() => setSaveAsNewMode(true)}
+                                            className="w-full py-2 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <Plus className="w-3 h-3" />
+                                            Save as New...
+                                        </button>
+                                        <button
+                                            onClick={closeSaveInput}
+                                            className="w-full py-1.5 text-[10px] text-white/40 hover:text-white transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center gap-2 text-xs font-medium text-white/70">
+                                            <Edit3 className="w-3 h-3" />
+                                            <span>Name your mix</span>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={presetName}
+                                            onChange={(e) => setPresetName(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSaveNew()}
+                                            placeholder="Study Vibes..."
+                                            className="w-full px-3 py-2 text-sm bg-black/50 rounded-lg border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                                            autoFocus
+                                        />
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={handleSaveNew}
+                                                disabled={!presetName.trim()}
+                                                className="flex-1 py-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={activePreset ? () => setSaveAsNewMode(false) : closeSaveInput}
+                                                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs transition-all"
+                                            >
+                                                {activePreset ? 'Back' : 'Cancel'}
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         ) : (
                             <button
@@ -398,34 +448,62 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                             <div className="bg-white/5 rounded-xl p-4 border border-white/5">
                                 {showSaveInput ? (
                                     <div className="space-y-3">
-                                        <div className="flex items-center gap-2 text-xs font-medium text-white/70">
-                                            <Edit3 className="w-3 h-3" />
-                                            <span>Name your mix</span>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            value={presetName}
-                                            onChange={(e) => setPresetName(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleSavePreset()}
-                                            placeholder="My Relaxing Mix..."
-                                            className="w-full px-4 py-3 text-sm bg-black/50 rounded-xl border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-indigo-500"
-                                            autoFocus
-                                        />
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={handleSavePreset}
-                                                disabled={!presetName.trim()}
-                                                className="flex-1 py-3 rounded-xl bg-indigo-500 text-white text-sm font-medium"
-                                            >
-                                                Save Preset
-                                            </button>
-                                            <button
-                                                onClick={() => { setShowSaveInput(false); setPresetName(''); }}
-                                                className="px-4 py-3 rounded-xl bg-white/10 text-white text-sm"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
+                                        {activePreset && !saveAsNewMode ? (
+                                            <>
+                                                <div className="text-xs font-medium text-white/70 px-1">
+                                                    Current: <span className="text-white">{activePreset.name}</span>
+                                                </div>
+                                                <button
+                                                    onClick={handleUpdateActive}
+                                                    className="w-full py-3 rounded-xl bg-indigo-500 text-white text-sm font-medium"
+                                                >
+                                                    Update Existing
+                                                </button>
+                                                <button
+                                                    onClick={() => setSaveAsNewMode(true)}
+                                                    className="w-full py-3 rounded-xl bg-white/10 text-white text-sm"
+                                                >
+                                                    Save as New...
+                                                </button>
+                                                <button
+                                                    onClick={closeSaveInput}
+                                                    className="w-full py-2 text-xs text-white/40"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center gap-2 text-xs font-medium text-white/70">
+                                                    <Edit3 className="w-3 h-3" />
+                                                    <span>Name your mix</span>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    value={presetName}
+                                                    onChange={(e) => setPresetName(e.target.value)}
+                                                    onKeyDown={(e) => e.key === 'Enter' && handleSaveNew()}
+                                                    placeholder="My Relaxing Mix..."
+                                                    className="w-full px-4 py-3 text-sm bg-black/50 rounded-xl border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-indigo-500"
+                                                    autoFocus
+                                                />
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={handleSaveNew}
+                                                        disabled={!presetName.trim()}
+                                                        className="flex-1 py-3 rounded-xl bg-indigo-500 text-white text-sm font-medium"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        onClick={activePreset ? () => setSaveAsNewMode(false) : closeSaveInput}
+                                                        className="px-4 py-3 rounded-xl bg-white/10 text-white text-sm"
+                                                    >
+                                                        {activePreset ? 'Back' : 'Cancel'}
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 ) : (
                                     <button

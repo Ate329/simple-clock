@@ -20,6 +20,8 @@ export const useSoundscapes = () => {
         }
     });
 
+    const [loadedPresetId, setLoadedPresetId] = useState(null);
+
     const toggleSound = useCallback((category, filename) => {
         const id = `${category}/${filename}`;
 
@@ -72,21 +74,6 @@ export const useSoundscapes = () => {
     const changeMasterVolume = useCallback((newMasterVolume) => {
         const clamped = Math.max(0, Math.min(1, newMasterVolume));
         setMasterVolume(clamped);
-
-        // Update all active audio instances
-        Object.keys(audioRefs.current).forEach(id => {
-            const audio = audioRefs.current[id];
-            // Get the individual volume from state, default to 0.5 if not found (shouldn't happen)
-            // leveraging the closure activeSounds might be stale, so better to pass the setter logic or use refs, 
-            // but for now we need the CURRENT individual volumes.
-            // Actually, we can't easily access the *latest* activeSounds here if we don't include it in dependency.
-            // So we'll iterate activeSounds from the state passed to this hook? No, that causes re-renders/audio glitches if we are not careful.
-            // Let's use a function updater or similar?
-            // Better: activeSounds is in dependency? No good for frequent updates.
-            // Optimization: Store individual volumes in audioRefs or a separate ref if needed, 
-            // BUT simpler: activeSounds IS available in the component scope.
-        });
-
     }, []);
 
     // Effect to sync master volume changes to audio elements
@@ -105,6 +92,7 @@ export const useSoundscapes = () => {
         });
         audioRefs.current = {};
         setActiveSounds({});
+        setLoadedPresetId(null);
     }, []);
 
     // Save current state as a preset
@@ -124,6 +112,36 @@ export const useSoundscapes = () => {
             localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(updated));
             return updated;
         });
+
+        // Auto-select the newly saved preset
+        setLoadedPresetId(newPreset.id);
+
+        return true;
+    }, [activeSounds, masterVolume]);
+
+    // Update an existing preset
+    const updatePreset = useCallback((id, name) => {
+        if (!id) return false;
+
+        setPresets(prev => {
+            const updated = prev.map(p => {
+                if (p.id === id) {
+                    return {
+                        ...p,
+                        name: name ? name.trim() : p.name,
+                        activeSounds: { ...activeSounds },
+                        masterVolume,
+                        updatedAt: new Date().toISOString() // Track modification
+                    };
+                }
+                return p;
+            });
+            localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+        });
+
+        // Ensure we keep tracking this ID
+        setLoadedPresetId(id);
 
         return true;
     }, [activeSounds, masterVolume]);
@@ -156,6 +174,7 @@ export const useSoundscapes = () => {
         });
 
         setActiveSounds(newActiveSounds);
+        setLoadedPresetId(presetId);
     }, [presets]);
 
     // Delete a preset
@@ -165,7 +184,10 @@ export const useSoundscapes = () => {
             localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(updated));
             return updated;
         });
-    }, []);
+        if (loadedPresetId === presetId) {
+            setLoadedPresetId(null);
+        }
+    }, [loadedPresetId]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -185,7 +207,9 @@ export const useSoundscapes = () => {
         stopAll,
         soundData,
         presets,
+        activePresetId: loadedPresetId, // Expose as activePresetId for clarity
         savePreset,
+        updatePreset, // Check this!
         loadPreset,
         deletePreset
     };
