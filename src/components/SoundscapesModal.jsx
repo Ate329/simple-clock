@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Volume2, Volume1, Power, Music, Save, FolderOpen, Trash2, Plus, Check, Play, Edit3 } from 'lucide-react';
 
 const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
@@ -22,10 +22,10 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
     const [categoryContentKey, setCategoryContentKey] = useState(0);
     const [isNavigatingBack, setIsNavigatingBack] = useState(false);
 
-    useEffect(() => {
+    const resetPresetEditing = () => {
         setIsEditingName(false);
         setEditNameValue('');
-    }, [selectedPresetId]);
+    };
 
     if (!isOpen && !isClosing) return null;
 
@@ -44,7 +44,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
             setCategoryContentKey(prev => prev + 1);
             setActiveCategory(cat);
             setSelectedPresetId(null);
-            setIsEditingName(false);
+            resetPresetEditing();
         }
     };
 
@@ -52,6 +52,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
         setIsNavigatingBack(true);
         setTimeout(() => {
             setSelectedPresetId(null);
+            resetPresetEditing();
             setIsNavigatingBack(false);
         }, 300);
     };
@@ -475,6 +476,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                                                 if (confirm('Are you sure you want to delete this preset?')) {
                                                     deletePreset(selectedPreset.id);
                                                     setSelectedPresetId(null);
+                                                    resetPresetEditing();
                                                 }
                                             }}
                                             className="flex items-center gap-2 px-4 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-all text-sm"
@@ -507,7 +509,10 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                                             return (
                                                 <div
                                                     key={preset.id}
-                                                    onClick={() => setSelectedPresetId(preset.id)}
+                                                    onClick={() => {
+                                                        setSelectedPresetId(preset.id);
+                                                        resetPresetEditing();
+                                                    }}
                                                     className="group relative p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-white/10 transition-all duration-300 flex flex-col cursor-pointer"
                                                 >
                                                     <div className="flex items-start justify-between mb-4">
@@ -590,14 +595,14 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                         ) : (
                             // SOUND GRID VIEW
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {soundData[activeCategory]?.map(filename => {
-                                    const id = `${activeCategory}/${filename}`;
+                                {soundData[activeCategory]?.map(track => {
+                                    const id = track.id;
                                     const isActive = !!activeSounds[id];
-                                    const volume = activeSounds[id]?.volume ?? 0.5;
+                                    const volume = activeSounds[id]?.volume ?? track.defaultVolume ?? 0.5;
 
                                     return (
                                         <div
-                                            key={filename}
+                                            key={track.file}
                                             className={`group relative p-4 rounded-xl transition-all duration-300 border ${isActive
                                                 ? 'bg-white/10 border-indigo-500/50'
                                                 : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
@@ -605,10 +610,10 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                                         >
                                             <div className="flex items-center justify-between mb-3">
                                                 <span className={`font-medium text-sm transition-colors duration-300 truncate pr-2 ${isActive ? 'text-indigo-300' : 'text-white/90'}`}>
-                                                    {formatName(filename)}
+                                                    {track.label}
                                                 </span>
                                                 <button
-                                                    onClick={() => toggleSound(activeCategory, filename)}
+                                                    onClick={() => toggleSound(activeCategory, track.file)}
                                                     className={`p-2.5 rounded-full transition-all duration-300 ${isActive
                                                         ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 scale-105'
                                                         : 'bg-white/10 opacity-50 text-white hover:opacity-100 hover:bg-white/20'
@@ -631,7 +636,7 @@ const SoundscapesModal = ({ isOpen, onClose, soundscapes, settings }) => {
                                                             max="1"
                                                             step="0.01"
                                                             value={volume}
-                                                            onChange={(e) => setVolume(activeCategory, filename, parseFloat(e.target.value))}
+                                                            onChange={(e) => setVolume(activeCategory, track.file, parseFloat(e.target.value))}
                                                             className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
                                                             style={{
                                                                 background: `linear-gradient(to right, #6366f1 ${volume * 100}%, rgba(255, 255, 255, 0.1) ${volume * 100}%)`

@@ -29,19 +29,79 @@
     "droplets.mp3",
     "howling-wind.mp3",
     "jungle.mp3",
-    "river.mp3",
+    {
+      "file": "river.mp3",
+      "label": "River",
+      "defaultVolume": 0.45,
+      "gainDb": -2,
+      "loop": {
+        "mode": "crossfade",
+        "start": 0.18,
+        "end": 113.2,
+        "crossfadeMs": 800
+      }
+    },
     "walk-in-snow.mp3",
     "walk-on-gravel.mp3",
     "walk-on-leaves.mp3",
     "waterfall.mp3",
-    "waves.mp3",
-    "wind-in-trees.mp3",
+    {
+      "file": "waves.mp3",
+      "label": "Waves",
+      "defaultVolume": 0.42,
+      "gainDb": -2.5,
+      "loop": {
+        "mode": "crossfade",
+        "start": 0.22,
+        "end": 98.4,
+        "crossfadeMs": 950
+      }
+    },
+    {
+      "file": "wind-in-trees.mp3",
+      "label": "Wind In Trees",
+      "defaultVolume": 0.44,
+      "gainDb": -1.5,
+      "loop": {
+        "mode": "crossfade",
+        "start": 0.12,
+        "end": 57.35,
+        "crossfadeMs": 700
+      }
+    },
     "wind.mp3"
   ],
   "noise": [
-    "brown-noise.wav",
-    "pink-noise.wav",
-    "white-noise.wav"
+    {
+      "file": "brown-noise.wav",
+      "label": "Brown Noise",
+      "defaultVolume": 0.4,
+      "gainDb": -3.5,
+      "loop": {
+        "mode": "crossfade",
+        "crossfadeMs": 220
+      }
+    },
+    {
+      "file": "pink-noise.wav",
+      "label": "Pink Noise",
+      "defaultVolume": 0.34,
+      "gainDb": -4,
+      "loop": {
+        "mode": "crossfade",
+        "crossfadeMs": 180
+      }
+    },
+    {
+      "file": "white-noise.wav",
+      "label": "White Noise",
+      "defaultVolume": 0.36,
+      "gainDb": -4,
+      "loop": {
+        "mode": "crossfade",
+        "crossfadeMs": 180
+      }
+    }
   ],
   "places": [
     "airport.mp3",
@@ -62,19 +122,63 @@
     "underwater.mp3"
   ],
   "rain": [
-    "heavy-rain.mp3",
-    "light-rain.mp3",
+    {
+      "file": "heavy-rain.mp3",
+      "label": "Heavy Rain",
+      "defaultVolume": 0.52,
+      "gainDb": -2,
+      "loop": {
+        "mode": "crossfade",
+        "start": 0.24,
+        "end": 21.66,
+        "crossfadeMs": 900
+      }
+    },
+    {
+      "file": "light-rain.mp3",
+      "label": "Light Rain",
+      "defaultVolume": 0.48,
+      "gainDb": -1.5,
+      "loop": {
+        "mode": "crossfade",
+        "start": 0.18,
+        "end": 149.6,
+        "crossfadeMs": 650
+      }
+    },
     "rain-on-car-roof.mp3",
     "rain-on-leaves.mp3",
     "rain-on-tent.mp3",
     "rain-on-umbrella.mp3",
-    "rain-on-window.mp3",
+    {
+      "file": "rain-on-window.mp3",
+      "label": "Rain On Window",
+      "defaultVolume": 0.46,
+      "gainDb": -1.5,
+      "loop": {
+        "mode": "crossfade",
+        "start": 0.2,
+        "end": 32.95,
+        "crossfadeMs": 700
+      }
+    },
     "thunder.mp3"
   ],
   "things": [
     "boiling-water.mp3",
     "bubbles.mp3",
-    "ceiling-fan.mp3",
+    {
+      "file": "ceiling-fan.mp3",
+      "label": "Ceiling Fan",
+      "defaultVolume": 0.38,
+      "gainDb": -3,
+      "loop": {
+        "mode": "crossfade",
+        "start": 0.1,
+        "end": 15.4,
+        "crossfadeMs": 320
+      }
+    },
     "clock.mp3",
     "dryer.mp3",
     "keyboard.mp3",
