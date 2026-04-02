@@ -194,7 +194,11 @@
     "windshield-wipers.mp3"
   ],
   "transport": [
-    "airplane.mp3",
+    {
+      "file": "airplane.mp3",
+      "label": "Airplane",
+      "gainDb": 15
+    },
     "inside-a-train.mp3",
     "rowing-boat.mp3",
     "sailboat.mp3",
